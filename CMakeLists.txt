@@ -51,7 +51,7 @@ add_library(libkem STATIC
     src/AST.cpp
     src/Parser.cpp
     src/SemanticAnalyzer.cpp
-    # src/IRGenerator.cpp
+    src/IRGenerator.cpp
     # src/JITEngine.cpp
 )
 
