@@ -3,6 +3,9 @@
 
 namespace kem {
 
+// ─────────────────────────────────────────────
+//  phaseName
+// ─────────────────────────────────────────────
 const char* phaseName(Phase p) {
     switch (p) {
         case Phase::LANG_CONFIG: return "Configuración";
@@ -16,6 +19,9 @@ const char* phaseName(Phase p) {
     }
 }
 
+// ─────────────────────────────────────────────
+//  KemError
+// ─────────────────────────────────────────────
 KemError::KemError(Phase phase, const std::string& message, int line, int col)
     : phase_(phase), message_(message), line_(line), col_(col) {}
 
@@ -35,7 +41,9 @@ const char* KemError::what() const noexcept {
     return formatted_.c_str();
 }
 
+// ─────────────────────────────────────────────
 //  Helpers por fase
+// ─────────────────────────────────────────────
 void lexError(const std::string& msg, int line, int col) {
     throw KemError(Phase::LEXER, msg, line, col);
 }

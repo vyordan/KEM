@@ -4,6 +4,12 @@
 
 namespace kem {
 
+// ─────────────────────────────────────────────
+//  TokenType
+//  Enum interno del compilador — completamente
+//  independiente del idioma del archivo fuente.
+//  LangConfig mapea strings del JSON a estos valores.
+// ─────────────────────────────────────────────
 enum class TokenType {
 
     // ── Literales ──────────────────────────────
@@ -83,6 +89,11 @@ enum class TokenType {
     UNKNOWN
 };
 
+// ─────────────────────────────────────────────
+//  Token
+//  Unidad mínima producida por el Lexer.
+//  Viaja a través de todo el pipeline hasta el Parser.
+// ─────────────────────────────────────────────
 struct Token {
     TokenType   type;
     std::string lexeme;  // texto original tal como aparece en el fuente

@@ -5,11 +5,15 @@
 
 namespace kem {
 
+// ─────────────────────────────────────────────
+//  Constructor
+// ─────────────────────────────────────────────
 Lexer::Lexer(const std::string& src, const LangConfig& config)
     : src_(src), config_(config) {}
 
-
-
+// ─────────────────────────────────────────────
+//  Navegación
+// ─────────────────────────────────────────────
 char Lexer::current() const {
     if (isAtEnd()) return '\0';
     return src_[pos_];
@@ -36,13 +40,17 @@ bool Lexer::isAtEnd() const {
     return pos_ >= static_cast<int>(src_.size());
 }
 
+// ─────────────────────────────────────────────
 //  Marca el inicio del token actual
+// ─────────────────────────────────────────────
 void Lexer::markTokenStart() {
     tokenStartLine_ = line_;
     tokenStartCol_  = col_;
 }
 
+// ─────────────────────────────────────────────
 //  Builders de tokens
+// ─────────────────────────────────────────────
 Token Lexer::makeToken(TokenType type, const std::string& lexeme) const {
     return Token(type, lexeme, tokenStartLine_, tokenStartCol_);
 }
@@ -51,22 +59,28 @@ Token Lexer::makeToken(TokenType type, char c) const {
     return Token(type, std::string(1, c), tokenStartLine_, tokenStartCol_);
 }
 
+// ─────────────────────────────────────────────
 //  Utilidades de clasificación de caracteres
+// ─────────────────────────────────────────────
 bool Lexer::isDigit(char c)    const { return c >= '0' && c <= '9'; }
 bool Lexer::isAlpha(char c)    const { return (c >= 'a' && c <= 'z') ||
                                               (c >= 'A' && c <= 'Z') ||
                                                c == '_'; }
 bool Lexer::isAlphaNum(char c) const { return isAlpha(c) || isDigit(c); }
 
+// ─────────────────────────────────────────────
 //  Saltar espacios y tabs (NO newlines)
-//  Los newlines son tokens importantes para el Parser por que sabesmos que no estamos usnado punto y coma
+//  Los newlines son tokens importantes para el Parser.
+// ─────────────────────────────────────────────
 void Lexer::skipWhitespaceNoNewline() {
     while (!isAtEnd() && (current() == ' ' || current() == '\t' || current() == '\r')) {
         advance();
     }
 }
 
-//los comentarios no tienen que generar tokens :) jsjsjs
+// ─────────────────────────────────────────────
+//  Comentarios — no producen tokens
+// ─────────────────────────────────────────────
 void Lexer::skipLineComment() {
     // Consume hasta fin de línea (pero NO el '\n' — ese es un NEWLINE token)
     while (!isAtEnd() && current() != '\n') {
@@ -110,7 +124,9 @@ void Lexer::skipKemBlockComment() {
     lexError("Bloque comentario{ sin cerrar (falta '}')", line_, col_);
 }
 
-//  readNumber INTEGER_LIT o FLOAT_LIT
+// ─────────────────────────────────────────────
+//  readNumber — INTEGER_LIT o FLOAT_LIT
+// ─────────────────────────────────────────────
 Token Lexer::readNumber() {
     markTokenStart();
     std::string num;
@@ -132,7 +148,9 @@ Token Lexer::readNumber() {
     return makeToken(is_float ? TokenType::FLOAT_LIT : TokenType::INTEGER_LIT, num);
 }
 
-//  readString STRING_LIT
+// ─────────────────────────────────────────────
+//  readString — STRING_LIT
+// ─────────────────────────────────────────────
 Token Lexer::readString() {
     markTokenStart();
     advance(); // consume la comilla de apertura '"'
@@ -168,7 +186,9 @@ Token Lexer::readString() {
     return makeToken(TokenType::STRING_LIT, value);
 }
 
+// ─────────────────────────────────────────────
 //  readIdentOrKw — IDENT o keyword del idioma
+// ─────────────────────────────────────────────
 Token Lexer::readIdentOrKw() {
     markTokenStart();
     std::string word;
@@ -222,7 +242,9 @@ Token Lexer::readIdentOrKw() {
     return makeToken(type, word);
 }
 
+// ─────────────────────────────────────────────
 //  readSymbol — operadores y delimitadores
+// ─────────────────────────────────────────────
 Token Lexer::readSymbol() {
     markTokenStart();
     char c = advance();
@@ -296,7 +318,9 @@ Token Lexer::readSymbol() {
     return makeToken(TokenType::UNKNOWN, c);
 }
 
+// ─────────────────────────────────────────────
 //  readNewline
+// ─────────────────────────────────────────────
 Token Lexer::readNewline() {
     markTokenStart();
     // Consumir uno o más newlines consecutivos — para el Parser
@@ -307,7 +331,9 @@ Token Lexer::readNewline() {
     return makeToken(TokenType::NEWLINE, "\\n");
 }
 
+// ─────────────────────────────────────────────
 //  tokenize — punto de entrada principal
+// ─────────────────────────────────────────────
 std::vector<Token> Lexer::tokenize() {
     std::vector<Token> tokens;
     tokens.reserve(256); // reserva inicial razonable

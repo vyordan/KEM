@@ -7,7 +7,11 @@
 #include <algorithm>
 
 namespace kem {
-// Claves obligatorias a buscar en el JSON de idioma
+
+// ─────────────────────────────────────────────
+//  Keywords obligatorias
+//  Todo archivo de idioma debe definir estas.
+// ─────────────────────────────────────────────
 const std::vector<std::string>& LangConfig::requiredKeywords() {
     static const std::vector<std::string> required = {
         "KW_ENTERO", "KW_DECIMAL", "KW_TEXTO", "KW_BOOLEANO",
@@ -19,7 +23,11 @@ const std::vector<std::string>& LangConfig::requiredKeywords() {
     return required;
 }
 
-//  tokenTypeFromString convierte el string del JSON al TokenType interno ("KW_FUNCION" → TokenType::KW_FUNCION)
+// ─────────────────────────────────────────────
+//  tokenTypeFromString
+//  Convierte el string del JSON al TokenType interno.
+//  Ejemplo: "KW_FUNCION" → TokenType::KW_FUNCION
+// ─────────────────────────────────────────────
 TokenType LangConfig::tokenTypeFromString(const std::string& name) {
     static const std::unordered_map<std::string, TokenType> table = {
         {"KW_ENTERO",    TokenType::KW_ENTERO},
@@ -52,7 +60,16 @@ TokenType LangConfig::tokenTypeFromString(const std::string& name) {
     return it->second;
 }
 
-//  Parser JSON mínimo — solo soporta el formato plano que tenemos
+// ─────────────────────────────────────────────
+//  loadFromFile
+//  Parser JSON mínimo — solo soporta el formato
+//  flat de los archivos de idioma:
+//  {
+//    "keyword": "TOKEN_TYPE",
+//    ...
+//  }
+//  Sin arrays, sin objetos anidados, sin números.
+// ─────────────────────────────────────────────
 void LangConfig::loadFromFile(const std::string& json_path) {
     std::ifstream file(json_path);
     if (!file.is_open()) {
@@ -112,7 +129,11 @@ void LangConfig::loadFromFile(const std::string& json_path) {
     }
 }
 
-//  Verifica que todas las keywords obligatorias estén presentes en el mapa cargado.
+// ─────────────────────────────────────────────
+//  validate
+//  Verifica que todas las keywords obligatorias
+//  estén presentes en el mapa cargado.
+// ─────────────────────────────────────────────
 void LangConfig::validate() const {
     // Construir el set de TokenTypes presentes en el mapa
     std::vector<std::string> missing;
@@ -143,11 +164,17 @@ void LangConfig::validate() const {
     }
 }
 
+// ─────────────────────────────────────────────
+//  Constructor
+// ─────────────────────────────────────────────
 LangConfig::LangConfig(const std::string& json_path) : path_(json_path) {
     loadFromFile(json_path);
     validate();
 }
 
+// ─────────────────────────────────────────────
+//  resolve
+// ─────────────────────────────────────────────
 TokenType LangConfig::resolve(const std::string& word) const {
     auto it = keyword_map_.find(word);
     if (it != keyword_map_.end()) {

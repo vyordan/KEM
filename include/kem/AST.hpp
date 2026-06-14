@@ -7,7 +7,9 @@
 
 namespace kem {
 
+// ─────────────────────────────────────────────
 //  Forward declarations para el patrón Visitor
+// ─────────────────────────────────────────────
 struct NumberLiteral;
 struct FloatLiteral;
 struct StringLiteral;
@@ -32,10 +34,12 @@ struct StructDef;
 struct LinkDecl;
 struct Program;
 
+// ─────────────────────────────────────────────
 //  Visitor
 //  Cada fase que opera sobre el AST es un Visitor:
 //  SemanticAnalyzer, IRGenerator, etc.
 //  Agregar una fase nueva no requiere tocar los nodos.
+// ─────────────────────────────────────────────
 struct Visitor {
     virtual ~Visitor() = default;
 
@@ -64,7 +68,9 @@ struct Visitor {
     virtual void visit(Program&)        = 0;
 };
 
+// ─────────────────────────────────────────────
 //  ASTNode — base de todos los nodos
+// ─────────────────────────────────────────────
 struct ASTNode {
     int line = 0;
     int col  = 0;
@@ -75,9 +81,11 @@ struct ASTNode {
 
 using NodePtr = std::unique_ptr<ASTNode>;
 
+// ─────────────────────────────────────────────
 //  Tipo representado en el AST
 //  Cubre: entero, decimal, texto, booleano
 //  y sus variantes en arreglo: entero[N], etc.
+// ─────────────────────────────────────────────
 enum class TypeKind {
     ENTERO,
     DECIMAL,
@@ -96,8 +104,9 @@ struct TypeAnnotation {
     std::string toString() const;
 };
 
-
+// ─────────────────────────────────────────────
 //  Expresiones
+// ─────────────────────────────────────────────
 
 struct NumberLiteral : ASTNode {
     long long value;
@@ -190,9 +199,9 @@ struct MemberExpr : ASTNode {
     void accept(Visitor& v) override { v.visit(*this); }
 };
 
-
+// ─────────────────────────────────────────────
 //  Sentencias
-
+// ─────────────────────────────────────────────
 
 // Asignación: lvalue = expr
 // lvalue puede ser IdentExpr, IndexExpr, o MemberExpr
@@ -298,8 +307,9 @@ struct Block : ASTNode {
     void accept(Visitor& v) override { v.visit(*this); }
 };
 
+// ─────────────────────────────────────────────
 //  Parámetro de función
-
+// ─────────────────────────────────────────────
 struct Param {
     TypeAnnotation type;
     std::string    type_name; // nombre si es tipo de usuario (struct)
@@ -309,7 +319,9 @@ struct Param {
     int            col    = 0;
 };
 
+// ─────────────────────────────────────────────
 //  Declaraciones de nivel superior
+// ─────────────────────────────────────────────
 
 // funcion nombre(params) tipo_retorno { body }
 struct FuncDef : ASTNode {
@@ -372,7 +384,9 @@ struct LinkDecl : ASTNode {
     void accept(Visitor& v) override { v.visit(*this); }
 };
 
+// ─────────────────────────────────────────────
 //  Raíz del AST
+// ─────────────────────────────────────────────
 struct Program : ASTNode {
     std::vector<NodePtr> decls;    // funciones, procedimientos, estructuras, enlazar
     NodePtr              main_block; // el bloque inicio { }
@@ -385,3 +399,8 @@ struct Program : ASTNode {
 };
 
 } // namespace kem
+// NOTE: agregado por fix fase-2
+// Este archivo fue modificado al final — ver struct Param arriba
+// El campo type_name en Param guarda el nombre del tipo cuando
+// es un tipo de usuario (struct) en lugar de un tipo primitivo.
+// Cuando type.kind == TypeKind::UNKNOWN, usar type_name.

@@ -5,7 +5,9 @@
 
 namespace kem {
 
+// ─────────────────────────────────────────────
 //  Fases del compilador — para identificar el origen del error
+// ─────────────────────────────────────────────
 enum class Phase {
     LANG_CONFIG,
     LEXER,
@@ -18,10 +20,12 @@ enum class Phase {
 
 const char* phaseName(Phase p);
 
+// ─────────────────────────────────────────────
 //  KemError
 //  Excepción base del compilador.
 //  Todas las fases lanzan este tipo — el CLI lo captura
 //  y formatea el mensaje antes de imprimir a stderr.
+// ─────────────────────────────────────────────
 class KemError : public std::exception {
 public:
     KemError(Phase phase,
@@ -30,6 +34,7 @@ public:
              int col  = 0);
 
     // Mensaje formateado para mostrar al usuario:
+    // "Error [Léxico] línea 5, col 12: carácter inesperado '@'"
     const char* what() const noexcept override;
 
     Phase       phase()   const { return phase_;   }
@@ -45,8 +50,11 @@ private:
     mutable std::string formatted_;  // cache del mensaje formateado
 };
 
+// ─────────────────────────────────────────────
 //  Helpers — para lanzar errores desde cada fase
 //  sin repetir el boilerplate de construir KemError
+// ─────────────────────────────────────────────
+
 [[noreturn]] void lexError(const std::string& msg, int line, int col);
 [[noreturn]] void parseError(const std::string& msg, int line, int col);
 [[noreturn]] void semanticError(const std::string& msg, int line, int col);
