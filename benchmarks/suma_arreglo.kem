@@ -1,0 +1,20 @@
+// KEM Benchmark — Suma de arreglo con bucle
+// Mide rendimiento de acceso a memoria y loops
+
+funcion sumaArreglo(entero n) entero {
+    entero nums[1000] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    entero suma = 0
+    entero i
+    i = 0 hasta n {
+        suma = suma + i
+    }
+    devolver suma
+}
+
+inicio {
+    entero r = sumaArreglo(1000)
+}

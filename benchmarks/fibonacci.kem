@@ -1,0 +1,13 @@
+// KEM Benchmark — Fibonacci recursivo
+// Caso de prueba: fib(35) — mide rendimiento de llamadas recursivas y JIT
+
+funcion fibonacci(entero n) entero {
+    si n < 2 {
+        devolver n
+    }
+    devolver fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+inicio {
+    entero resultado = fibonacci(35)
+}
