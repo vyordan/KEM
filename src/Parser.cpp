@@ -4,11 +4,15 @@
 
 namespace kem {
 
+// ─────────────────────────────────────────────
 //  Constructor
+// ─────────────────────────────────────────────
 Parser::Parser(std::vector<Token> tokens)
     : tokens_(std::move(tokens)) {}
 
+// ─────────────────────────────────────────────
 //  Navegación
+// ─────────────────────────────────────────────
 const Token& Parser::current() const {
     return tokens_[pos_];
 }
@@ -48,7 +52,9 @@ void Parser::skipNewlines() {
     while (check(TokenType::NEWLINE)) advance();
 }
 
+// ─────────────────────────────────────────────
 //  Recuperación de errores
+// ─────────────────────────────────────────────
 void Parser::syncError(const std::string& msg, int line, int col) {
     ++errors_;
     // Imprimir el error inmediatamente para acumular varios
@@ -68,7 +74,9 @@ void Parser::synchronize() {
     }
 }
 
+// ─────────────────────────────────────────────
 //  Tipos
+// ─────────────────────────────────────────────
 bool Parser::isTypeToken(TokenType t) const {
     return t == TokenType::KW_ENTERO  ||
            t == TokenType::KW_DECIMAL ||
@@ -120,7 +128,9 @@ TypeAnnotation Parser::parseType() {
     return ta;
 }
 
+// ─────────────────────────────────────────────
 //  Punto de entrada principal
+// ─────────────────────────────────────────────
 std::unique_ptr<Program> Parser::parse() {
     skipNewlines();
 
@@ -160,7 +170,9 @@ std::unique_ptr<Program> Parser::parse() {
     return std::make_unique<Program>(std::move(decls), std::move(main_block));
 }
 
+// ─────────────────────────────────────────────
 //  Declaraciones de nivel superior
+// ─────────────────────────────────────────────
 NodePtr Parser::parseTopLevel() {
     if (check(TokenType::KW_FUNCION))    return parseFuncDef();
     if (check(TokenType::KW_PROC))       return parseProcDef();
@@ -172,7 +184,9 @@ NodePtr Parser::parseTopLevel() {
     return nullptr;
 }
 
+// ─────────────────────────────────────────────
 //  funcion nombre(params) tipo { body }
+// ─────────────────────────────────────────────
 NodePtr Parser::parseFuncDef() {
     int ln = current().line, cl = current().col;
     advance(); // consume 'funcion'
@@ -197,7 +211,9 @@ NodePtr Parser::parseFuncDef() {
                                      std::move(body), ln, cl);
 }
 
+// ─────────────────────────────────────────────
 //  procedimiento nombre(params) { body }
+// ─────────────────────────────────────────────
 NodePtr Parser::parseProcDef() {
     int ln = current().line, cl = current().col;
     advance(); // consume 'procedimiento'
@@ -218,7 +234,9 @@ NodePtr Parser::parseProcDef() {
     return std::make_unique<ProcDef>(name, std::move(params), std::move(body), ln, cl);
 }
 
+// ─────────────────────────────────────────────
 //  Parámetros
+// ─────────────────────────────────────────────
 std::vector<Param> Parser::parseParams() {
     std::vector<Param> params;
     skipNewlines();
@@ -271,7 +289,9 @@ Param Parser::parseParam() {
     return p;
 }
 
+// ─────────────────────────────────────────────
 //  estructura Nombre { campos }
+// ─────────────────────────────────────────────
 NodePtr Parser::parseStructDef() {
     int ln = current().line, cl = current().col;
     advance(); // consume 'estructura'
@@ -313,7 +333,9 @@ NodePtr Parser::parseStructDef() {
     return std::make_unique<StructDef>(name, std::move(fields), ln, cl);
 }
 
+// ─────────────────────────────────────────────
 //  enlazar tipo nombre(tipo1, tipo2, ...)
+// ─────────────────────────────────────────────
 NodePtr Parser::parseLinkDecl() {
     int ln = current().line, cl = current().col;
     advance(); // consume 'enlazar'
@@ -340,7 +362,9 @@ NodePtr Parser::parseLinkDecl() {
     return std::make_unique<LinkDecl>(ret, name, std::move(param_types), ln, cl);
 }
 
+// ─────────────────────────────────────────────
 //  Bloque { sentencias }
+// ─────────────────────────────────────────────
 NodePtr Parser::parseBlock() {
     int ln = current().line, cl = current().col;
     expect(TokenType::LBRACE, "Se esperaba '{'");
@@ -365,7 +389,9 @@ NodePtr Parser::parseBlock() {
     return std::make_unique<Block>(std::move(stmts), ln, cl);
 }
 
+// ─────────────────────────────────────────────
 //  Sentencias
+// ─────────────────────────────────────────────
 NodePtr Parser::parseStmt() {
     skipNewlines();
 
@@ -390,14 +416,19 @@ NodePtr Parser::parseStmt() {
     }
 }
 
+// ─────────────────────────────────────────────
 //  Declaración de variable o arreglo
 //  tipo nombre [= expr]
 //  tipo nombre[N] [= [e1, ...]]
+// ─────────────────────────────────────────────
 NodePtr Parser::parseVarOrArrayDecl() {
     int ln = current().line, cl = current().col;
     TypeAnnotation type = parseType();
 
-    if (!check(TokenType::IDENT)) {
+    // El nombre puede ser cualquier token no-operador (permite variables llamadas
+    // "x", "y", "o", "i", etc. que colisionan con keywords cortas)
+    if (isAtEnd() || check(TokenType::NEWLINE) || check(TokenType::LBRACE) ||
+        check(TokenType::RBRACE) || check(TokenType::EOF_TOK)) {
         syncError("Se esperaba el nombre de la variable", current().line, current().col);
     }
     std::string name = current().lexeme;
@@ -445,6 +476,7 @@ NodePtr Parser::parseVarOrArrayDecl() {
     return std::make_unique<VarDecl>(type, name, std::move(init), false, ln, cl);
 }
 
+// ─────────────────────────────────────────────
 //  Sentencia que empieza con IDENT
 //  Puede ser:
 //    asignación:  x = expr
@@ -452,6 +484,7 @@ NodePtr Parser::parseVarOrArrayDecl() {
 //    asign miembro: x.campo = expr
 //    bucle for:   x = expr hasta expr [paso expr] { }
 //    llamada:     funcion(args)
+// ─────────────────────────────────────────────
 NodePtr Parser::parseIdentStmt() {
     int ln = current().line, cl = current().col;
     std::string name = current().lexeme;
@@ -537,7 +570,9 @@ NodePtr Parser::parseIdentStmt() {
     return nullptr;
 }
 
+// ─────────────────────────────────────────────
 //  si expr { } [sino { } / sino si { }]
+// ─────────────────────────────────────────────
 NodePtr Parser::parseIfStmt() {
     int ln = current().line, cl = current().col;
     advance(); // consume 'si'
@@ -568,7 +603,9 @@ NodePtr Parser::parseIfStmt() {
                                      std::move(else_b), ln, cl);
 }
 
+// ─────────────────────────────────────────────
 //  mientras expr { }
+// ─────────────────────────────────────────────
 NodePtr Parser::parseWhileStmt() {
     int ln = current().line, cl = current().col;
     advance(); // consume 'mientras'
@@ -580,7 +617,9 @@ NodePtr Parser::parseWhileStmt() {
     return std::make_unique<WhileStmt>(std::move(cond), std::move(body), ln, cl);
 }
 
+// ─────────────────────────────────────────────
 //  devolver [expr]
+// ─────────────────────────────────────────────
 NodePtr Parser::parseReturnStmt() {
     int ln = current().line, cl = current().col;
     advance(); // consume 'devolver'
@@ -595,6 +634,7 @@ NodePtr Parser::parseReturnStmt() {
     return std::make_unique<ReturnStmt>(std::move(value), ln, cl);
 }
 
+// ─────────────────────────────────────────────
 //  Expresiones — Pratt parsing
 //
 //  Tabla de precedencias (mayor número = más fuerte):
@@ -606,6 +646,7 @@ NodePtr Parser::parseReturnStmt() {
 //    * / %      → 6
 //    no - (uni) → se manejan en parsePrimary
 //    . [] ()    → se manejan en parsePostfix
+// ─────────────────────────────────────────────
 int Parser::binopPrec(const Token& t) const {
     switch (t.type) {
         case TokenType::KW_O:  return 1;
@@ -655,7 +696,9 @@ NodePtr Parser::parseExpr(int minPrec) {
     return left;
 }
 
+// ─────────────────────────────────────────────
 //  Primarios
+// ─────────────────────────────────────────────
 NodePtr Parser::parsePrimary() {
     int ln = current().line, cl = current().col;
 
@@ -740,8 +783,10 @@ NodePtr Parser::parsePrimary() {
     return nullptr;
 }
 
+// ─────────────────────────────────────────────
 //  Postfijos: . y []
 //  Se aplican de izquierda a derecha sobre cualquier expr
+// ─────────────────────────────────────────────
 NodePtr Parser::parsePostfix(NodePtr left) {
     while (true) {
         int ln = current().line, cl = current().col;
