@@ -1,0 +1,10 @@
+// KEM — Suma de arreglo con bucle hasta
+inicio {
+    entero nums[5] = [10, 20, 30, 40, 50]
+    entero suma = 0
+    entero i
+
+    i = 0 hasta 5 {
+        suma = suma + nums[i]
+    }
+}

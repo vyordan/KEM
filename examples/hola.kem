@@ -1,0 +1,9 @@
+// KEM — Programa mínimo
+// Para imprimir necesitás: enlazar vacio printf(texto)
+// y compilar con soporte de libc
+
+enlazar vacio printf(texto)
+
+inicio {
+    printf("Hola desde KEM!\n")
+}

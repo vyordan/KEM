@@ -1,0 +1,11 @@
+// KEM — Factorial recursivo
+funcion factorial(entero n) entero {
+    si n == 0 {
+        devolver 1
+    }
+    devolver n * factorial(n - 1)
+}
+
+inicio {
+    entero resultado = factorial(10)
+}
