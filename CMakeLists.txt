@@ -52,7 +52,7 @@ add_library(libkem STATIC
     src/Parser.cpp
     src/SemanticAnalyzer.cpp
     src/IRGenerator.cpp
-    # src/JITEngine.cpp
+    src/JITEngine.cpp
 )
 
 # Nombre sin el prefijo 'lib' para claridad
