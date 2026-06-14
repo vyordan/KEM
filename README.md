@@ -4,9 +4,15 @@
   **Un Lenguaje que habla tu Idioma**
 </div>
 
-# KEM — Compilador JIT con sintaxis en español
+# KEM 
+## Lenguaje de Programación y Compilador JIT (C++/LLVM)
 
-KEM es un compilador JIT que toma código fuente escrito en un lenguaje de programación con sintaxis en español y lo compila a código nativo vía LLVM. El idioma de las palabras clave es configurable mediante un archivo JSON, lo que permite usar el mismo compilador en cualquier idioma natural.
+**Kem** (*"tejer"* en el idioma K'iche') es un lenguaje de programación de sintaxis sencilla diseñado originalmente en español, que se ejecuta de forma nativa a través de su propio compilador JIT (Just-In-Time) de alto rendimiento.
+
+El proyecto es un ecosistema integrado que unifica un lenguaje accesible con una infraestructura de bajo nivel basada en **LLVM**.
+
+* **Compilación JIT Nativa:** Toma el código fuente y lo compila directamente a código de máquina al vuelo vía LLVM, garantizando una ejecución rápida.
+* **Modularidad Lingüística Absoluta:** Aunque la sintaxis por defecto es en español, el idioma de las palabras clave es 100% configurable mediante un archivo JSON externo. Esto permite reutilizar el mismo compilador para mapear el lenguaje a cualquier idioma natural o variante maya (como el Kaqchikel o K'iche').
 
 ---
 
