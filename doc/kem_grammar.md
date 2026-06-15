@@ -519,5 +519,3 @@ inicio {
 | Comentarios duales | `//` y `comentario` | Universal + intuitivo para hispanohablantes |
 
 ---
-
-*Próximo paso: implementar el Lexer consumiendo esta gramática como especificación.*

@@ -4,7 +4,6 @@
   **Un Lenguaje que habla tu Idioma**
 </div>
 
-# KEM 
 ## Lenguaje de Programación y Compilador JIT (C++/LLVM)
 
 **Kem** (*"tejer"* en el idioma K'iche') es un lenguaje de programación de sintaxis sencilla diseñado originalmente en español, que se ejecuta de forma nativa a través de su propio compilador JIT (Just-In-Time) de alto rendimiento.
@@ -278,18 +277,6 @@ Ejecución
 | `IRGenerator`            | AST → LLVM IR vía IRBuilder                  |
 | `JITEngine`              | IR → código nativo + ejecución (ORC JIT)     |
 | `ErrorHandler`           | Mensajes de error uniformes con línea/col    |
-
----
-
-## Benchmarks
-
-```bash
-cd benchmarks
-./run_benchmark.sh
-```
-
-Los benchmarks comparan KEM contra Python 3 e incluyen medición de
-latencia por fase del compilador para análisis en la tesis.
 
 ---
 

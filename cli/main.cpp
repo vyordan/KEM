@@ -248,14 +248,9 @@ void printBenchmark(int64_t t_lang, int64_t t_lex, int64_t t_parse,
     int64_t t_total = t_lang + t_lex + t_parse + t_sem +
                       t_codegen + t_jit + t_exec;
 
-    auto bar = [](int64_t t, int64_t total, int width=20) {
+    auto bar = [](int64_t t, int64_t total, int width=20) -> std::string {
         int filled = total > 0 ? (int)((double)t / total * width) : 0;
-
-        std::string bar = "";
-        for (int i = 0; i < filled; ++i) bar += "█";
-        for (int i = 0; i < width - filled; ++i) bar += "░";
-        return bar;
-
+        return std::string(filled, '#') + std::string(width - filled, '.');
     };
 
     std::cout << "\n── Benchmark KEM ──────────────────────────────\n";

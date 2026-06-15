@@ -7,7 +7,8 @@ RUN pacman -Syu --noconfirm && \
         lld  \
         cmake \
         ninja \
-        git && \
+        git \
+        gcc && \
     pacman -Scc --noconfirm
 
 # ── Copiar el proyecto ─────────────────────────────────────────────────────────
@@ -21,7 +22,6 @@ RUN cmake -B build -G Ninja \
     cmake --build build
 
 # ── Punto de entrada ───────────────────────────────────────────────────────────
-# langs/ queda en /kem/build/cli/langs/ (copiado por el target copy_langs)
 WORKDIR /kem/build/cli
 ENTRYPOINT ["./kem"]
 CMD ["--help"]

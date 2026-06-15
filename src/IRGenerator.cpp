@@ -30,8 +30,8 @@ llvm::Type* IRGenerator::toLLVMType(TypeKind kind) {
         case TypeKind::ENTERO:   return llvm::Type::getInt64Ty(ctx_);
         case TypeKind::DECIMAL:  return llvm::Type::getDoubleTy(ctx_);
         case TypeKind::BOOLEANO: return llvm::Type::getInt1Ty(ctx_);
-        case TypeKind::TEXTO:    return llvm::PointerType::get(
-                                     llvm::Type::getInt8Ty(ctx_), 0);
+        case TypeKind::TEXTO:    return llvm::PointerType::get(ctx_, 0);
+        // LLVM 17+: opaque pointers — ya no se especifica el tipo pointee
         case TypeKind::VOID:     return llvm::Type::getVoidTy(ctx_);
         default:
             // UNKNOWN se usa para structs de usuario — por ahora i64
@@ -622,7 +622,12 @@ void IRGenerator::visit(BoolLiteral& lit) {
 
 void IRGenerator::visit(StringLiteral& lit) {
     // Crear una cadena global constante y retornar el puntero
-    last_value_ = builder_.CreateGlobalStringPtr(lit.value, "str");
+    // LLVM 17+: CreateGlobalString retorna un GlobalVariable*,
+    // luego lo casteamos a Value* vía GEP para obtener el i8*
+    llvm::Constant* str_const = builder_.CreateGlobalString(lit.value, "str");
+    last_value_ = llvm::ConstantExpr::getPointerCast(
+        str_const,
+        llvm::PointerType::get(ctx_, 0));
 }
 
 // ─────────────────────────────────────────────
