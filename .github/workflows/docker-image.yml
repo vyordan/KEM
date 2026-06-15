@@ -26,5 +26,5 @@ jobs:
           context: .
           push: true
           tags: |
-            tu_usuario/kem:latest
-            tu_usuario/kem:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/kem:latest
+            ${{ secrets.DOCKER_USERNAME }}/kem:${{ github.sha }}
