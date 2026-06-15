@@ -1,3 +1,6 @@
+[![Docker Image Size](https://img.shields.io/docker/image-size/vyordan/kem?label=Tama%C3%B1o%20de%20la%20imagen)](https://hub.docker.com/r/vyordan/kem)
+[![Docker Pulls](https://img.shields.io/docker/pulls/vyordan/kem?label=Descargas)](https://hub.docker.com/r/vyordan/kem)
+
 <div align="center">
   <img src="doc/xd (1).png" alt="KEM logo extendido" width="250"/>
   
