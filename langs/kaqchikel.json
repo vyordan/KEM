@@ -1,0 +1,31 @@
+{
+  "_nombre": "kaqchikel",
+  "_descripcion": "Archivo de idioma Kaqchikel para KEM — inclusión lingüística guatemalteca",
+  "_version": "0.1",
+
+  "tz'aqat_ajilab'al": "KW_ENTERO",
+  "peraj_ajilab'al":   "KW_DECIMAL",
+  "tz'ib'awuj":         "KW_TEXTO",
+  "q'atb'al_tzij":     "KW_BOOLEANO",
+
+  "samajib'al":        "KW_FUNCION",
+  "rub'anikil":        "KW_PROC",
+  "tzelejisaxik":      "KW_DEVOLVER",
+  "tikirisanik":       "KW_INICIO",
+
+  "we":                "KW_SI",
+  "we_man_je_ta":      "KW_SINO",
+  "wakami_taq":        "KW_MIENTRAS",
+  "k'a_ya_ri'":        "KW_HASTA",
+  "xak'at":            "KW_PASO",
+
+  "q'itzij":           "KW_VERDADERO",
+  "man_q'itzij_ta":    "KW_FALSO",
+  "chuqa'":            "KW_Y",
+  "on":                "KW_O",
+  "man_oq_ta":         "KW_NO",
+
+  "ruwachtisaxik":     "KW_ESTRUCTURA",
+  "natab'al":          "KW_REF",
+  "tunuwuj":           "KW_ENLAZAR"
+}

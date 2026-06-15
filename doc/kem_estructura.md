@@ -135,7 +135,7 @@ kem_tests  (EXECUTABLE)  →  libkem, GTest
   └── tests/**/*.cpp
 ```
 
-Cuando en el futuro llegues a `grpc/`, solo hacés:
+Cuando en el futuro lleguemos a `grpc/`, solo se hace:
 ```cmake
 add_executable(kem_server grpc/server.cpp)
 target_link_libraries(kem_server PRIVATE libkem)
@@ -215,25 +215,3 @@ CMD ["--help"]
 > está disponible dentro del contenedor sin ningún volumen extra.
 
 ---
-
-## Archivos que se crean en la Fase 1
-
-La Fase 1 (núcleo mínimo) solo necesita:
-
-```
-CMakeLists.txt          ← con target libkem y ejecutable kem
-include/kem/Token.hpp
-include/kem/LangConfig.hpp
-include/kem/Lexer.hpp
-include/kem/ErrorHandler.hpp
-src/LangConfig.cpp
-src/Lexer.cpp
-src/ErrorHandler.cpp
-cli/CMakeLists.txt
-cli/main.cpp            ← solo tokeniza e imprime tokens por ahora
-langs/espanol.json
-tests/lexer/test_tokens.cpp
-```
-
-El resto de los archivos se crean vacíos con un `// TODO` para que
-CMake no falle al intentar compilar targets que aún no existen.

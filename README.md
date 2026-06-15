@@ -7,15 +7,17 @@
   **Un Lenguaje que habla tu Idioma**
 </div>
 
-## Lenguaje de Programación y Compilador JIT (C++/LLVM)
+# Lenguaje de Programación / Compilador JIT (C++/LLVM)
 
-**Kem** (*"tejer"* en el idioma K'iche') es un lenguaje de programación de sintaxis sencilla diseñado originalmente en español, que se ejecuta de forma nativa a través de su propio compilador JIT (Just-In-Time) de alto rendimiento.
+**Kem** (*"tejer"* en el idioma K'iche') es un lenguaje de programación de sintaxis sencilla diseñado originalmente en español, que se ejecuta de forma nativa a través de su propio compilador JIT (Just-In-Time).
 
-El proyecto es un ecosistema integrado que unifica un lenguaje accesible con una infraestructura de bajo nivel basada en **LLVM**.
+El proyecto es un ecosistema integrado que unifica un lenguaje accesible con una infraestructura de bajo nivel basada en **LLVM**, utiliza **C++** para el pasar del Codigo fuente (codigo KEM) a LLVM IR.
 
 * **Compilación JIT Nativa:** Toma el código fuente y lo compila directamente a código de máquina al vuelo vía LLVM, garantizando una ejecución rápida.
 * **Modularidad Lingüística Absoluta:** Aunque la sintaxis por defecto es en español, el idioma de las palabras clave es 100% configurable mediante un archivo JSON externo. Esto permite reutilizar el mismo compilador para mapear el lenguaje a cualquier idioma natural o variante maya (como el Kaqchikel o K'iche').
 
+---
+[Documentacion](doc/kem_documentacion.md) - En la carpeta doc se encuentra documentacion mas detallada y completa, este README es una presentacion rapida de lo que es el proyecto. 
 ---
 
 ## Requisitos
@@ -42,7 +44,6 @@ cmake --build build
 ./build/cli/kem --help
 ```
 
----
 
 ## Uso
 
@@ -67,6 +68,22 @@ cmake --build build
 ```
 
 ---
+
+## Docker
+
+```bash
+# Construir la imagen
+docker build -t kem .
+
+# Ejecutar un programa
+docker run --rm -v $(pwd)/mi_programa.kem:/programa.kem kem /programa.kem
+
+# Ver el IR generado
+docker run --rm -v $(pwd)/mi_programa.kem:/programa.kem kem --emit-ir /programa.kem
+```
+
+---
+
 
 ## Ejemplo de programa KEM
 
@@ -226,21 +243,6 @@ ctest --output-on-failure
 
 ---
 
-## Docker
-
-```bash
-# Construir la imagen
-docker build -t kem .
-
-# Ejecutar un programa
-docker run --rm -v $(pwd)/mi_programa.kem:/programa.kem kem /programa.kem
-
-# Ver el IR generado
-docker run --rm -v $(pwd)/mi_programa.kem:/programa.kem kem --emit-ir /programa.kem
-```
-
----
-
 ## Arquitectura del compilador
 
 ```
@@ -267,6 +269,73 @@ ORC JIT ─────────── código nativo x86-64
     ▼
 Ejecución
 ```
+## Árbol completo
+
+```
+kem/
+├── CMakeLists.txt                  ← build raíz, ensambla todos los sub-targets
+├── README.md
+├── Dockerfile
+├── .gitignore
+│
+├── include/
+│   └── kem/
+│       ├── LangConfig.hpp          ← carga el JSON de idioma, resuelve keywords → TokenType
+│       ├── Token.hpp               ← struct Token + enum TokenType (sin lógica, solo datos)
+│       ├── Lexer.hpp               ← tokenizador
+│       ├── AST.hpp                 ← todos los nodos del AST + interfaz Visitor
+│       ├── Parser.hpp              ← recursive descent + Pratt
+│       ├── SemanticAnalyzer.hpp    ← Visitor: verifica tipos y scopes
+│       ├── IRGenerator.hpp         ← Visitor: AST → LLVM IR
+│       ├── JITEngine.hpp           ← wrapper del ORC JIT
+│       └── ErrorHandler.hpp        ← errores con línea, columna y mensaje localizable
+│
+├── src/
+│   ├── LangConfig.cpp
+│   ├── Lexer.cpp
+│   ├── AST.cpp                     ← implementación de métodos de los nodos (si los hay)
+│   ├── Parser.cpp
+│   ├── SemanticAnalyzer.cpp
+│   ├── IRGenerator.cpp
+│   └── JITEngine.cpp
+│   └── ErrorHandler.cpp
+│
+├── cli/
+│   ├── CMakeLists.txt              ← target ejecutable: kem
+│   └── main.cpp                    ← parsea args, carga LangConfig, corre el pipeline
+│
+├── langs/                          ← archivos de idioma intercambiables
+│   ├── espanol.json                ← idioma por defecto
+│   └── english.json                ← demostración del sistema multi-idioma
+│
+├── examples/                       ← programas KEM de ejemplo (también usados en tests)
+│   ├── hola.kem
+│   ├── fibonacci.kem
+│   ├── factorial.kem
+│   ├── arreglos.kem
+│   └── estructuras.kem
+│
+├── tests/
+│   ├── CMakeLists.txt
+│   ├── lexer/
+│   │   ├── test_tokens.cpp         ← tokeniza strings conocidos, verifica output
+│   │   └── test_comentarios.cpp
+│   ├── parser/
+│   │   ├── test_expresiones.cpp
+│   │   ├── test_funciones.cpp
+│   │   └── test_flujo.cpp
+│   ├── semantic/
+│   │   ├── test_tipos.cpp          ← errores semánticos esperados
+│   │   └── test_scopes.cpp
+│   ├── codegen/
+│   │   └── test_ir.cpp             ← verifica que el IR generado sea válido
+│   └── integration/
+│       └── test_ejemplos.cpp       ← compila y ejecuta examples/*.kem, verifica resultado
+
+```
+
+---
+
 
 ### Módulos
 
