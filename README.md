@@ -32,7 +32,7 @@ Versión mínima de LLVM: **17**. Probado con LLVM 22.
 ## Compilar
 
 ```bash
-git clone https://github.com/tu-usuario/kem
+git clone https://github.com/vyordan/kem
 cd kem
 
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
