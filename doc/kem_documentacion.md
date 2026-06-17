@@ -20,14 +20,15 @@ lo que permite usar el mismo compilador en cualquier idioma natural.
 7. [Procedimientos](#7-procedimientos)
 8. [Arreglos](#8-arreglos)
 9. [Estructuras](#9-estructuras)
-10. [Interoperabilidad con C](#10-interoperabilidad-con-c-enlazar)
-11. [Comentarios](#11-comentarios)
-12. [Reglas de continuación de línea](#12-reglas-de-continuación-de-línea)
-13. [El sistema multi-idioma](#13-el-sistema-multi-idioma)
-14. [Qué se puede hacer](#14-qué-se-puede-hacer)
-15. [Qué NO se puede hacer todavía](#15-qué-no-se-puede-hacer-todavía)
-16. [Mensajes de error](#16-mensajes-de-error)
-17. [Referencia rápida de keywords](#17-referencia-rápida-de-keywords)
+10. [Funciones de consola](#10-funciones-builtin-de-consola)
+11. [Interoperabilidad con C](#11-interoperabilidad-con-c-enlazar)
+12. [Comentarios](#12-comentarios)
+13. [Reglas de continuación de línea](#13-reglas-de-continuación-de-línea)
+14. [El sistema multi-idioma](#14-el-sistema-multi-idioma)
+15. [Qué se puede hacer](#15-qué-se-puede-hacer)
+16. [Qué NO se puede hacer todavía](#16-qué-no-se-puede-hacer-todavía)
+17. [Mensajes de error](#17-mensajes-de-error)
+18. [Referencia rápida de keywords](#18-referencia-rápida-de-keywords)
 
 ---
 
@@ -578,7 +579,126 @@ Las estructuras están diseñadas para ser completadas en la siguiente fase.
 
 ---
 
-## 10. Interoperabilidad con C (`enlazar`)
+## 10. Funciones builtin de consola
+(ESTA FUNCION QUIZA SEA QUITADA MAS ADELANTE Y SE INCLUYA CUANDO YA TENGAMOS UNA LIBRERIA ESTADAR)
+
+KEM incluye funciones de entrada/salida integradas directamente en el
+compilador. No requieren `enlazar` ni ninguna declaracion especial.
+Estan disponibles en cualquier parte del programa sin importar nada.
+
+### Salida
+
+```
+imprimir(texto)          // imprime el texto sin salto de linea al final
+imprimirLinea(texto)     // imprime el texto con salto de linea al final
+imprimirEntero(entero)   // imprime un entero en formato decimal
+imprimirDecimal(decimal) // imprime un decimal con 6 cifras decimales
+```
+
+**Ejemplos:**
+
+```
+inicio {
+    imprimir("Hola, ")
+    imprimirLinea("mundo!")          // salida: Hola, mundo!
+
+    imprimirEntero(42)               // salida: 42
+    imprimirEntero(-7)               // salida: -7
+
+    imprimirDecimal(3.14159)         // salida: 3.141590
+    imprimirDecimal(2.0)             // salida: 2.000000
+
+    imprimir("resultado = ")
+    imprimirEntero(3 + 4 * 2)        // salida: resultado = 11
+}
+```
+
+Se pueden combinar para formatear salida compleja:
+
+```
+funcion mostrar(texto etiqueta, entero valor) {
+    // procedimiento de salida
+}
+// Ojo — lo de arriba deberia ser procedimiento, ejemplo:
+
+procedimiento mostrar(texto etiqueta, entero valor) {
+    imprimir(etiqueta)
+    imprimir(": ")
+    imprimirEntero(valor)
+    imprimirLinea("")
+}
+
+inicio {
+    mostrar("resultado", 42)         // salida: resultado: 42
+}
+```
+
+### Entrada
+
+```
+leerLinea()   → texto    // lee una linea completa de stdin
+leerEntero()  → entero   // lee un numero entero de stdin
+leerDecimal() → decimal  // lee un numero decimal de stdin
+```
+
+**Ejemplos:**
+
+```
+inicio {
+    imprimir("Ingresa tu nombre: ")
+    texto nombre = leerLinea()
+    imprimir("Hola, ")
+    imprimirLinea(nombre)
+
+    imprimir("Ingresa un numero: ")
+    entero n = leerEntero()
+    imprimir("El doble es: ")
+    imprimirEntero(n * 2)
+    imprimirLinea("")
+
+    imprimir("Ingresa un decimal: ")
+    decimal d = leerDecimal()
+    imprimirDecimal(d * d)
+}
+```
+
+### Uso dentro de funciones y loops
+
+Los builtins funcionan en cualquier contexto — dentro de funciones,
+procedimientos, loops y condicionales:
+
+```
+procedimiento imprimirTabla(entero n) {
+    entero i
+    i = 1 hasta 11 {
+        imprimir("  ")
+        imprimirEntero(n)
+        imprimir(" x ")
+        imprimirEntero(i)
+        imprimir(" = ")
+        imprimirEntero(n * i)
+        imprimirLinea("")
+    }
+}
+
+inicio {
+    imprimir("Tabla del: ")
+    entero n = leerEntero()
+    imprimirTabla(n)
+}
+```
+
+### Restricciones
+
+- `imprimir` e `imprimirLinea` solo aceptan `texto` — para imprimir
+  numeros usar `imprimirEntero` o `imprimirDecimal`
+- `leerEntero` y `leerDecimal` no validan la entrada — si el usuario
+  escribe letras el comportamiento es indefinido
+- `imprimirDecimal` siempre muestra 6 cifras decimales
+
+---
+
+## 11. Interoperabilidad con C (`enlazar`)
 
 `enlazar` declara una función externa implementada en C (o cualquier
 librería del sistema) que el JIT resuelve en tiempo de ejecución.

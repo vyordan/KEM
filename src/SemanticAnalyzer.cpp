@@ -401,7 +401,92 @@ void SemanticAnalyzer::visit(UnaryExpr& expr) {
     }
 }
 
+// ─────────────────────────────────────────────
+//  Builtins del lenguaje KEM
+//  Estas funciones son nativas — no requieren enlazar ni declarar.
+//  El semántico las reconoce por nombre y verifica sus argumentos.
+//  El IRGenerator las emite directamente en LLVM IR.
+//
+//  imprimir(texto)        → void   imprime sin newline
+//  imprimirLinea(texto)   → void   imprime con newline al final
+//  imprimirEntero(entero) → void   imprime un entero como decimal
+//  imprimirDecimal(decimal)→ void  imprime un decimal
+//  leerLinea()            → texto  lee una línea de stdin
+//  leerEntero()           → entero lee un entero de stdin
+//  leerDecimal()          → decimal lee un decimal de stdin
+// ─────────────────────────────────────────────
+static bool isBuiltin(const std::string& name) {
+    return name == "imprimir"        ||
+           name == "imprimirLinea"   ||
+           name == "imprimirEntero"  ||
+           name == "imprimirDecimal" ||
+           name == "leerLinea"       ||
+           name == "leerEntero"      ||
+           name == "leerDecimal";
+}
+
+// Verifica argumentos de un builtin y retorna su tipo de resultado
+static std::pair<bool, TypeAnnotation> checkBuiltin(
+    const std::string& name,
+    const std::vector<std::unique_ptr<ASTNode>>& args)
+{
+    TypeAnnotation void_t  = {TypeKind::VOID,    false, 0};
+    TypeAnnotation texto_t = {TypeKind::TEXTO,   false, 0};
+    TypeAnnotation int_t   = {TypeKind::ENTERO,  false, 0};
+    TypeAnnotation dec_t   = {TypeKind::DECIMAL, false, 0};
+
+    // Funciones de salida — reciben 1 argumento
+    if (name == "imprimir" || name == "imprimirLinea") {
+        if (args.size() != 1) return {false, void_t};
+        return {true, void_t};   // acepta cualquier tipo de arg (texto preferido)
+    }
+    if (name == "imprimirEntero") {
+        if (args.size() != 1) return {false, void_t};
+        return {true, void_t};
+    }
+    if (name == "imprimirDecimal") {
+        if (args.size() != 1) return {false, void_t};
+        return {true, void_t};
+    }
+    // Funciones de entrada — sin argumentos
+    if (name == "leerLinea")  return {args.empty(), texto_t};
+    if (name == "leerEntero") return {args.empty(), int_t};
+    if (name == "leerDecimal")return {args.empty(), dec_t};
+
+    return {false, void_t};
+}
+
 void SemanticAnalyzer::visit(CallExpr& expr) {
+    // ── Builtins: se resuelven antes de buscar en la tabla de símbolos ───────
+    if (isBuiltin(expr.callee)) {
+        auto [ok, ret_type] = checkBuiltin(expr.callee, expr.args);
+        if (!ok) {
+            error("Llamada incorrecta al builtin '" + expr.callee + "'",
+                  expr.line, expr.col);
+            last_type_ = {TypeKind::UNKNOWN, false, 0};
+            return;
+        }
+        // Verificar tipos de argumentos para los que imprimen
+        if (expr.callee == "imprimirEntero" && !expr.args.empty()) {
+            expr.args[0]->accept(*this);
+            if (last_type_.kind != TypeKind::ENTERO &&
+                last_type_.kind != TypeKind::UNKNOWN)
+                error("imprimirEntero espera un 'entero'", expr.line, expr.col);
+        } else if (expr.callee == "imprimirDecimal" && !expr.args.empty()) {
+            expr.args[0]->accept(*this);
+            if (last_type_.kind != TypeKind::DECIMAL &&
+                last_type_.kind != TypeKind::UNKNOWN &&
+                !isNumeric(last_type_.kind))
+                error("imprimirDecimal espera un 'decimal'", expr.line, expr.col);
+        } else {
+            // imprimir / imprimirLinea: visitar el arg para detectar errores
+            for (auto& a : expr.args) a->accept(*this);
+        }
+        last_type_ = ret_type;
+        return;
+    }
+
+    // ── Funciones definidas por el usuario ────────────────────────────────────
     Symbol* sym = current_scope_->lookup(expr.callee);
     if (!sym) {
         error("'" + expr.callee + "' no está declarado", expr.line, expr.col);

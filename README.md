@@ -203,6 +203,64 @@ p.x = 1.0
 p.y = 2.0
 ```
 
+### Salida
+
+```
+imprimir(texto)          // imprime el texto sin salto de linea al final
+imprimirLinea(texto)     // imprime el texto con salto de linea al final
+imprimirEntero(entero)   // imprime un entero en formato decimal
+imprimirDecimal(decimal) // imprime un decimal con 6 cifras decimales
+```
+
+**Ejemplos:**
+
+```
+inicio {
+    imprimir("Hola, ")
+    imprimirLinea("mundo!")          // salida: Hola, mundo!
+
+    imprimirEntero(42)               // salida: 42
+    imprimirEntero(-7)               // salida: -7
+
+    imprimirDecimal(3.14159)         // salida: 3.141590
+    imprimirDecimal(2.0)             // salida: 2.000000
+
+    imprimir("resultado = ")
+    imprimirEntero(3 + 4 * 2)        // salida: resultado = 11
+}
+```
+
+Se pueden combinar para formatear salida compleja
+
+### Entrada
+
+```
+leerLinea()   → texto    // lee una linea completa de stdin
+leerEntero()  → entero   // lee un numero entero de stdin
+leerDecimal() → decimal  // lee un numero decimal de stdin
+```
+
+**Ejemplos:**
+
+```
+inicio {
+    imprimir("Ingresa tu nombre: ")
+    texto nombre = leerLinea()
+    imprimir("Hola, ")
+    imprimirLinea(nombre)
+
+    imprimir("Ingresa un numero: ")
+    entero n = leerEntero()
+    imprimir("El doble es: ")
+    imprimirEntero(n * 2)
+    imprimirLinea("")
+
+    imprimir("Ingresa un decimal: ")
+    decimal d = leerDecimal()
+    imprimirDecimal(d * d)
+}
+```
+
 ### Interoperabilidad con C
 
 ```

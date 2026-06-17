@@ -1,0 +1,38 @@
+// KEM — Calculadora interactiva simple
+
+procedimiento mostrarMenu() {
+    imprimirLinea("--- Calculadora KEM ---")
+    imprimirLinea("Operaciones disponibles:")
+    imprimirLinea("  1. Suma")
+    imprimirLinea("  2. Resta")
+    imprimirLinea("  3. Multiplicacion")
+    imprimirLinea("  4. Division")
+}
+
+funcion operar(entero op, decimal a, decimal b) decimal {
+    si op == 1 { devolver a + b }
+    si op == 2 { devolver a - b }
+    si op == 3 { devolver a * b }
+    si op == 4 { devolver a / b }
+    devolver 0.0
+}
+
+inicio {
+    mostrarMenu()
+    imprimirLinea("")
+
+    imprimir("Selecciona operacion (1-4): ")
+    entero op = leerEntero()
+
+    imprimir("Primer numero: ")
+    decimal a = leerDecimal()
+
+    imprimir("Segundo numero: ")
+    decimal b = leerDecimal()
+
+    decimal resultado = operar(op, a, b)
+
+    imprimirLinea("")
+    imprimir("Resultado: ")
+    imprimirDecimal(resultado)
+}

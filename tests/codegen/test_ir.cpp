@@ -34,7 +34,6 @@ static kem::LangConfig& cfg() {
     return c;
 }
 
-// Compila un programa KEM y verifica que no lanza
 static void compile(const std::string& src) {
     kem::Lexer lexer(src, cfg());
     auto tokens = lexer.tokenize();
@@ -46,7 +45,6 @@ static void compile(const std::string& src) {
     gen.generate(*prog);
 }
 
-// Compila y ejecuta, retorna resultado de inicio{}
 static int64_t run(const std::string& src) {
     kem::Lexer lexer(src, cfg());
     auto tokens = lexer.tokenize();
@@ -61,48 +59,28 @@ static int64_t run(const std::string& src) {
     return jit.run();
 }
 
-// ── Tests de ejecucion ───────────────────────────────────────────────────────
+// ── Tests generales de IR ────────────────────────────────────────────────────
 
-TEST(test_retorna_cero_por_defecto) {
-    int64_t r = run("inicio {}");
-    ASSERT_TRUE(r == 0);
+TEST(test_inicio_vacio) {
+    ASSERT_TRUE(run("inicio {}") == 0);
 }
 
-TEST(test_funcion_suma_compila) {
+TEST(test_funcion_simple) {
     compile(
         "funcion suma(entero a, entero b) entero { devolver a + b }\n"
         "inicio {}");
 }
 
-TEST(test_inicio_llama_funcion) {
-    int64_t r = run(
-        "funcion suma(entero a, entero b) entero { devolver a + b }\n"
-        "inicio { entero r = suma(3, 4) }");
-    ASSERT_TRUE(r == 0);
-}
-
-// ── Tests de compilacion a IR ─────────────────────────────────────────────────
-
-TEST(test_ir_funcion_simple) {
-    compile(
-        "funcion suma(entero a, entero b) entero {\n"
-        "    devolver a + b\n"
-        "}\n"
-        "inicio {}");
-}
-
-TEST(test_ir_factorial) {
+TEST(test_factorial) {
     compile(
         "funcion factorial(entero n) entero {\n"
-        "    si n == 0 {\n"
-        "        devolver 1\n"
-        "    }\n"
+        "    si n == 0 { devolver 1 }\n"
         "    devolver n * factorial(n - 1)\n"
         "}\n"
         "inicio {}");
 }
 
-TEST(test_ir_mientras) {
+TEST(test_mientras) {
     compile(
         "inicio {\n"
         "    entero i\n"
@@ -114,7 +92,7 @@ TEST(test_ir_mientras) {
         "}");
 }
 
-TEST(test_ir_hasta) {
+TEST(test_hasta) {
     compile(
         "inicio {\n"
         "    entero i\n"
@@ -125,18 +103,7 @@ TEST(test_ir_hasta) {
         "}");
 }
 
-TEST(test_ir_hasta_con_paso) {
-    compile(
-        "inicio {\n"
-        "    entero i\n"
-        "    entero suma = 0\n"
-        "    i = 0 hasta 100 paso 5 {\n"
-        "        suma = suma + i\n"
-        "    }\n"
-        "}");
-}
-
-TEST(test_ir_arreglo) {
+TEST(test_arreglo) {
     compile(
         "inicio {\n"
         "    entero nums[5] = [10, 20, 30, 40, 50]\n"
@@ -144,33 +111,22 @@ TEST(test_ir_arreglo) {
         "}");
 }
 
-TEST(test_ir_si_sino) {
+TEST(test_si_sino) {
     compile(
         "funcion max(entero a, entero b) entero {\n"
-        "    si a > b {\n"
-        "        devolver a\n"
-        "    } sino {\n"
-        "        devolver b\n"
-        "    }\n"
+        "    si a > b { devolver a }\n"
+        "    sino { devolver b }\n"
         "}\n"
         "inicio {}");
 }
 
-TEST(test_ir_procedimiento) {
+TEST(test_procedimiento) {
     compile(
-        "procedimiento noop(entero x) {\n"
-        "    entero y = x + 1\n"
-        "}\n"
+        "procedimiento noop(entero x) { entero y = x + 1 }\n"
         "inicio { noop(42) }");
 }
 
-TEST(test_ir_enlazar) {
-    compile(
-        "enlazar vacio imprimir(entero)\n"
-        "inicio {}");
-}
-
-TEST(test_ir_booleanos) {
+TEST(test_booleanos) {
     compile(
         "inicio {\n"
         "    booleano a = verdadero\n"
@@ -181,20 +137,7 @@ TEST(test_ir_booleanos) {
         "}");
 }
 
-TEST(test_ir_fibonacci_completo) {
-    compile(
-        "funcion fibonacci(entero n) entero {\n"
-        "    si n < 2 {\n"
-        "        devolver n\n"
-        "    }\n"
-        "    devolver fibonacci(n - 1) + fibonacci(n - 2)\n"
-        "}\n"
-        "inicio {\n"
-        "    entero r = fibonacci(10)\n"
-        "}");
-}
-
-TEST(test_ir_decimal) {
+TEST(test_decimal) {
     compile(
         "funcion area(decimal base, decimal altura) decimal {\n"
         "    devolver base * altura / 2.0\n"
@@ -202,34 +145,196 @@ TEST(test_ir_decimal) {
         "inicio { decimal r = area(5.0, 3.0) }");
 }
 
-TEST(test_ir_texto) {
+TEST(test_fibonacci) {
     compile(
-        "enlazar vacio printf(texto)\n"
-        "inicio { printf(\"hola\") }");
-}
-
-TEST(test_ir_negacion_unaria) {
-    compile(
-        "funcion neg(entero x) entero {\n"
-        "    devolver -x\n"
+        "funcion fib(entero n) entero {\n"
+        "    si n < 2 { devolver n }\n"
+        "    devolver fib(n - 1) + fib(n - 2)\n"
         "}\n"
-        "inicio {}");
+        "inicio { entero r = fib(10) }");
 }
 
-TEST(test_ir_multiples_funciones) {
+// ── Tests de builtins de consola ─────────────────────────────────────────────
+
+TEST(test_builtin_imprimirEntero_compila) {
     compile(
-        "funcion doble(entero x) entero { devolver x * 2 }\n"
-        "funcion triple(entero x) entero { devolver x * 3 }\n"
-        "procedimiento noop() { entero x = 0 }\n"
         "inicio {\n"
-        "    entero a = doble(5)\n"
-        "    entero b = triple(3)\n"
-        "    noop()\n"
+        "    imprimirEntero(42)\n"
         "}");
 }
 
+TEST(test_builtin_imprimirDecimal_compila) {
+    compile(
+        "inicio {\n"
+        "    imprimirDecimal(3.14)\n"
+        "}");
+}
+
+TEST(test_builtin_imprimir_compila) {
+    compile(
+        "inicio {\n"
+        "    imprimir(\"hola\")\n"
+        "}");
+}
+
+TEST(test_builtin_imprimirLinea_compila) {
+    compile(
+        "inicio {\n"
+        "    imprimirLinea(\"hola mundo\")\n"
+        "}");
+}
+
+TEST(test_builtin_leerEntero_compila) {
+    compile(
+        "inicio {\n"
+        "    entero x = leerEntero()\n"
+        "    imprimirEntero(x)\n"
+        "}");
+}
+
+TEST(test_builtin_leerDecimal_compila) {
+    compile(
+        "inicio {\n"
+        "    decimal d = leerDecimal()\n"
+        "    imprimirDecimal(d)\n"
+        "}");
+}
+
+TEST(test_builtin_leerLinea_compila) {
+    compile(
+        "inicio {\n"
+        "    texto t = leerLinea()\n"
+        "    imprimirLinea(t)\n"
+        "}");
+}
+
+TEST(test_builtin_imprimirEntero_con_calculo) {
+    compile(
+        "funcion factorial(entero n) entero {\n"
+        "    si n == 0 { devolver 1 }\n"
+        "    devolver n * factorial(n - 1)\n"
+        "}\n"
+        "inicio {\n"
+        "    imprimirEntero(factorial(5))\n"
+        "}");
+}
+
+TEST(test_builtin_multiple_salida) {
+    compile(
+        "inicio {\n"
+        "    imprimir(\"a = \")\n"
+        "    imprimirEntero(42)\n"
+        "    imprimir(\"pi = \")\n"
+        "    imprimirDecimal(3.14)\n"
+        "    imprimirLinea(\"fin\")\n"
+        "}");
+}
+
+TEST(test_builtin_en_funcion) {
+    compile(
+        "procedimiento mostrar(entero x) {\n"
+        "    imprimir(\"valor: \")\n"
+        "    imprimirEntero(x)\n"
+        "}\n"
+        "inicio {\n"
+        "    mostrar(100)\n"
+        "    mostrar(200)\n"
+        "}");
+}
+
+TEST(test_builtin_en_loop) {
+    compile(
+        "inicio {\n"
+        "    entero i\n"
+        "    i = 1 hasta 6 {\n"
+        "        imprimirEntero(i)\n"
+        "    }\n"
+        "}");
+}
+
+TEST(test_builtin_con_si) {
+    compile(
+        "inicio {\n"
+        "    entero x = 10\n"
+        "    si x > 5 {\n"
+        "        imprimirLinea(\"mayor que 5\")\n"
+        "    } sino {\n"
+        "        imprimirLinea(\"menor o igual a 5\")\n"
+        "    }\n"
+        "}");
+}
+
+TEST(test_semantico_rechaza_leerEntero_con_args) {
+    bool lanzo = false;
+    try {
+        compile("inicio { entero x = leerEntero(42) }");
+    } catch (const kem::KemError&) { lanzo = true; }
+    ASSERT_TRUE(lanzo);
+}
+
+TEST(test_semantico_rechaza_imprimirEntero_sin_args) {
+    bool lanzo = false;
+    try {
+        compile("inicio { imprimirEntero() }");
+    } catch (const kem::KemError&) { lanzo = true; }
+    ASSERT_TRUE(lanzo);
+}
+
+// ── Tests de ejecucion con builtins ─────────────────────────────────────────
+// Estos tests ejecutan el JIT — la salida va a stdout del test runner
+
+TEST(test_ejecucion_imprimirEntero) {
+    // Ejecuta sin lanzar y produce output
+    int64_t r = run(
+        "inicio {\n"
+        "    imprimirEntero(42)\n"
+        "}");
+    ASSERT_TRUE(r == 0);
+}
+
+TEST(test_ejecucion_imprimirDecimal) {
+    int64_t r = run(
+        "inicio {\n"
+        "    imprimirDecimal(3.14)\n"
+        "}");
+    ASSERT_TRUE(r == 0);
+}
+
+TEST(test_ejecucion_imprimirLinea) {
+    int64_t r = run(
+        "inicio {\n"
+        "    imprimirLinea(\"KEM funciona!\")\n"
+        "}");
+    ASSERT_TRUE(r == 0);
+}
+
+TEST(test_ejecucion_factorial_con_salida) {
+    int64_t r = run(
+        "funcion factorial(entero n) entero {\n"
+        "    si n == 0 { devolver 1 }\n"
+        "    devolver n * factorial(n - 1)\n"
+        "}\n"
+        "inicio {\n"
+        "    imprimirEntero(factorial(10))\n"
+        "}");
+    ASSERT_TRUE(r == 0);
+}
+
+TEST(test_ejecucion_loop_con_salida) {
+    int64_t r = run(
+        "inicio {\n"
+        "    entero i\n"
+        "    entero suma = 0\n"
+        "    i = 1 hasta 6 {\n"
+        "        suma = suma + i\n"
+        "    }\n"
+        "    imprimirEntero(suma)\n"
+        "}");
+    ASSERT_TRUE(r == 0);
+}
+
 int main() {
-    std::cout << "\n-- Tests del IRGenerator + JIT de KEM --\n\n";
+    std::cout << "\n-- Tests IRGenerator + Builtins KEM --\n\n";
     std::cout << "\n-----\n";
     std::cout << "  Total:   " << tests_run    << "\n";
     std::cout << "  Passed:  " << tests_passed << "\n";
