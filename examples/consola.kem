@@ -1,0 +1,51 @@
+// KEM — Ejemplo de consola interactiva
+// Demuestra los builtins: imprimir, imprimirLinea,
+// imprimirEntero, imprimirDecimal, leerEntero, leerDecimal, leerLinea
+
+funcion factorial(entero n) entero {
+    si n == 0 { devolver 1 }
+    devolver n * factorial(n - 1)
+}
+
+funcion esPar(entero n) booleano {
+    devolver n % 2 == 0
+}
+
+inicio {
+    imprimirLinea("=== Bienvenido a KEM ===")
+    imprimirLinea("")
+
+    // Leer un nombre
+    imprimir("Ingresa tu nombre: ")
+    texto nombre = leerLinea()
+    imprimir("Hola, ")
+    imprimirLinea(nombre)
+
+    // Leer un entero y calcular factorial
+    imprimirLinea("")
+    imprimir("Ingresa un numero entero (0-12): ")
+    entero n = leerEntero()
+
+    imprimir("Factorial de ")
+    imprimirEntero(n)
+    imprimir(" = ")
+    imprimirEntero(factorial(n))
+    imprimirLinea("")
+
+    // Par o impar
+    si esPar(n) {
+        imprimirLinea("El numero es par")
+    } sino {
+        imprimirLinea("El numero es impar")
+    }
+
+    // Leer un decimal
+    imprimirLinea("")
+    imprimir("Ingresa un numero decimal: ")
+    decimal d = leerDecimal()
+    imprimir("El doble es: ")
+    imprimirDecimal(d * 2.0)
+
+    imprimirLinea("")
+    imprimirLinea("=== Fin del programa ===")
+}

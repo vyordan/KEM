@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 // LLVM headers — orden importa
@@ -89,6 +90,14 @@ private:
     // Verifica si el bloque actual ya tiene terminador
     // (ret o br). Si lo tiene, no se puede insertar más.
     bool blockHasTerminator() const;
+
+    // ── Builtins nativos ───────────────────────
+    // Emite IR directamente para las funciones builtin de KEM
+    void emitBuiltin(CallExpr& expr);
+
+    // Obtiene o declara una función de la libc en el módulo actual
+    llvm::Function* getOrDeclareLibC(const std::string& name,
+                                      llvm::FunctionType* ft);
 
     // ── Pasada 1: declarar signaturas ──────────
     // Antes de generar cuerpos, declara todas las funciones

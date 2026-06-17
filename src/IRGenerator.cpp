@@ -721,7 +721,217 @@ void IRGenerator::visit(UnaryExpr& expr) {
 //  visit(CallExpr)
 //  nombre(arg1, arg2, ...)  →  call
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+//  getOrDeclareLibC
+//  Obtiene (o declara si no existe) una función de la libc en el módulo.
+//  Los builtins de KEM llaman a funciones de la libc internamente —
+//  el usuario nunca ve ni necesita escribir enlazar.
+// ─────────────────────────────────────────────
+llvm::Function* IRGenerator::getOrDeclareLibC(
+    const std::string& name,
+    llvm::FunctionType* ft)
+{
+    if (auto* f = module_->getFunction(name)) return f;
+    return llvm::Function::Create(
+        ft, llvm::Function::ExternalLinkage, name, module_.get());
+}
+
+// ─────────────────────────────────────────────
+//  emitBuiltin
+//  Emite el IR para cada función builtin de KEM.
+//  Internamente llama a printf/scanf/fgets de la libc.
+// ─────────────────────────────────────────────
+void IRGenerator::emitBuiltin(CallExpr& expr) {
+    llvm::Type* i64_t    = llvm::Type::getInt64Ty(ctx_);
+    llvm::Type* dbl_t    = llvm::Type::getDoubleTy(ctx_);
+    llvm::Type* i8ptr_t  = llvm::PointerType::get(ctx_, 0);
+    llvm::Type* void_t   = llvm::Type::getVoidTy(ctx_);
+    llvm::Type* i32_t    = llvm::Type::getInt32Ty(ctx_);
+
+    const std::string& name = expr.callee;
+
+    // ── imprimir(texto) → printf("%s", texto) ────────────────────────────────
+    if (name == "imprimir") {
+        expr.args[0]->accept(*this);
+        llvm::Value* val = last_value_;
+
+        // Declarar printf(i8*, ...) → i32
+        llvm::FunctionType* printf_t = llvm::FunctionType::get(
+            i32_t, {i8ptr_t}, true /* variadic */);
+        llvm::Function* printf_fn = getOrDeclareLibC("printf", printf_t);
+
+        llvm::Value* fmt = builder_.CreateGlobalString("%s", "fmt_s");
+        builder_.CreateCall(printf_t, printf_fn, {fmt, val});
+        last_value_ = nullptr;
+        return;
+    }
+
+    // ── imprimirLinea(texto) → printf("%s\n", texto) ─────────────────────────
+    if (name == "imprimirLinea") {
+        expr.args[0]->accept(*this);
+        llvm::Value* val = last_value_;
+
+        llvm::FunctionType* printf_t = llvm::FunctionType::get(
+            i32_t, {i8ptr_t}, true);
+        llvm::Function* printf_fn = getOrDeclareLibC("printf", printf_t);
+
+        llvm::Value* fmt = builder_.CreateGlobalString("%s\n", "fmt_sl");
+        builder_.CreateCall(printf_t, printf_fn, {fmt, val});
+        last_value_ = nullptr;
+        return;
+    }
+
+    // ── imprimirEntero(entero) → printf("%lld\n", n) ─────────────────────────
+    if (name == "imprimirEntero") {
+        expr.args[0]->accept(*this);
+        llvm::Value* val = last_value_;
+
+        // Si por alguna razón el valor es double, convertir a i64
+        if (val->getType()->isDoubleTy())
+            val = builder_.CreateFPToSI(val, i64_t, "to_int");
+
+        llvm::FunctionType* printf_t = llvm::FunctionType::get(
+            i32_t, {i8ptr_t}, true);
+        llvm::Function* printf_fn = getOrDeclareLibC("printf", printf_t);
+
+        llvm::Value* fmt = builder_.CreateGlobalString("%lld\n", "fmt_i");
+        builder_.CreateCall(printf_t, printf_fn, {fmt, val});
+        last_value_ = nullptr;
+        return;
+    }
+
+    // ── imprimirDecimal(decimal) → printf("%.6f\n", d) ──────────────────────
+    if (name == "imprimirDecimal") {
+        expr.args[0]->accept(*this);
+        llvm::Value* val = last_value_;
+
+        // Si el valor es entero, promover a double
+        if (val->getType()->isIntegerTy())
+            val = builder_.CreateSIToFP(val, dbl_t, "to_dbl");
+
+        llvm::FunctionType* printf_t = llvm::FunctionType::get(
+            i32_t, {i8ptr_t}, true);
+        llvm::Function* printf_fn = getOrDeclareLibC("printf", printf_t);
+
+        llvm::Value* fmt = builder_.CreateGlobalString("%.6f\n", "fmt_d");
+        builder_.CreateCall(printf_t, printf_fn, {fmt, val});
+        last_value_ = nullptr;
+        return;
+    }
+
+    // ── leerLinea() → fgets(buf, 256, stdin) → texto ─────────────────────────
+    if (name == "leerLinea") {
+        // Reservar buffer de 256 bytes en el stack
+        llvm::Type* buf_t = llvm::ArrayType::get(
+            llvm::Type::getInt8Ty(ctx_), 256);
+        llvm::AllocaInst* buf = createEntryAlloca(
+            current_fn_, buf_t, "readline_buf");
+
+        // Obtener puntero al inicio del buffer
+        llvm::Value* buf_ptr = builder_.CreateGEP(
+            buf_t, buf, {builder_.getInt64(0), builder_.getInt64(0)},
+            "buf_ptr");
+
+        // Declarar fgets(i8*, i32, i8*) → i8*
+        llvm::FunctionType* fgets_t = llvm::FunctionType::get(
+            i8ptr_t, {i8ptr_t, i32_t, i8ptr_t}, false);
+        llvm::Function* fgets_fn = getOrDeclareLibC("fgets", fgets_t);
+
+        // Obtener stdin via __acrt_iob_func o stdin directamente
+        // En Linux: stdin es una variable global de la libc
+        // La forma más portable es declarar un extern a stdin
+        llvm::FunctionType* get_stdin_t = llvm::FunctionType::get(
+            i8ptr_t, {i32_t}, false);
+        llvm::Function* get_stdin = getOrDeclareLibC("__fdopen", get_stdin_t);
+        (void)get_stdin;
+
+        // Alternativa más simple y portable: usar gets_s o fgets con fileno
+        // Usamos scanf("%255[^\n]") que es la forma más limpia sin stdin explícito
+        llvm::FunctionType* scanf_t = llvm::FunctionType::get(
+            i32_t, {i8ptr_t}, true);
+        llvm::Function* scanf_fn = getOrDeclareLibC("scanf", scanf_t);
+
+        // Limpiar el buffer primero
+        builder_.CreateStore(
+            llvm::Constant::getNullValue(buf_t), buf);
+
+        // scanf("%255[^\n]", buf)
+        llvm::Value* fmt = builder_.CreateGlobalString(
+            "%255[^\n]", "fmt_rl");
+        builder_.CreateCall(scanf_t, scanf_fn, {fmt, buf_ptr});
+
+        // Limpiar el '\n' residual del buffer de entrada
+        llvm::FunctionType* getchar_t = llvm::FunctionType::get(
+            i32_t, {}, false);
+        llvm::Function* getchar_fn = getOrDeclareLibC("getchar", getchar_t);
+        builder_.CreateCall(getchar_fn, {});
+
+        last_value_ = buf_ptr;
+        return;
+    }
+
+    // ── leerEntero() → scanf("%lld", &n) → entero ────────────────────────────
+    if (name == "leerEntero") {
+        llvm::AllocaInst* tmp = createEntryAlloca(
+            current_fn_, i64_t, "leer_int_tmp");
+
+        llvm::FunctionType* scanf_t = llvm::FunctionType::get(
+            i32_t, {i8ptr_t}, true);
+        llvm::Function* scanf_fn = getOrDeclareLibC("scanf", scanf_t);
+
+        llvm::Value* fmt = builder_.CreateGlobalString("%lld", "fmt_ri");
+        builder_.CreateCall(scanf_t, scanf_fn, {fmt, tmp});
+
+        // Limpiar newline
+        llvm::FunctionType* getchar_t = llvm::FunctionType::get(
+            i32_t, {}, false);
+        builder_.CreateCall(
+            getOrDeclareLibC("getchar", getchar_t), {});
+
+        last_value_ = builder_.CreateLoad(i64_t, tmp, "leer_int");
+        return;
+    }
+
+    // ── leerDecimal() → scanf("%lf", &d) → decimal ───────────────────────────
+    if (name == "leerDecimal") {
+        llvm::AllocaInst* tmp = createEntryAlloca(
+            current_fn_, dbl_t, "leer_dbl_tmp");
+
+        llvm::FunctionType* scanf_t = llvm::FunctionType::get(
+            i32_t, {i8ptr_t}, true);
+        llvm::Function* scanf_fn = getOrDeclareLibC("scanf", scanf_t);
+
+        llvm::Value* fmt = builder_.CreateGlobalString("%lf", "fmt_rd");
+        builder_.CreateCall(scanf_t, scanf_fn, {fmt, tmp});
+
+        // Limpiar newline
+        llvm::FunctionType* getchar_t = llvm::FunctionType::get(
+            i32_t, {}, false);
+        builder_.CreateCall(
+            getOrDeclareLibC("getchar", getchar_t), {});
+
+        last_value_ = builder_.CreateLoad(dbl_t, tmp, "leer_dbl");
+        return;
+    }
+
+    codegenError("Builtin desconocido: '" + name + "'", expr.line, expr.col);
+}
+
+// ─────────────────────────────────────────────
+//  visit(CallExpr)
+// ─────────────────────────────────────────────
 void IRGenerator::visit(CallExpr& expr) {
+    // ── Builtins nativos — se emiten directamente en IR ──────────────────────
+    static const std::unordered_set<std::string> builtins = {
+        "imprimir", "imprimirLinea", "imprimirEntero", "imprimirDecimal",
+        "leerLinea", "leerEntero", "leerDecimal"
+    };
+    if (builtins.count(expr.callee)) {
+        emitBuiltin(expr);
+        return;
+    }
+
+    // ── Funciones definidas por el usuario ────────────────────────────────────
     auto it = functions_.find(expr.callee);
     if (it == functions_.end()) {
         codegenError("Función '" + expr.callee + "' no encontrada",
