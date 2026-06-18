@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Aprende KEM · Clases de programación</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Estilos para las comparaciones de lenguajes */
+    .lang-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin: 1rem 0 0.5rem;
+      flex-wrap: wrap;
+    }
+    .lang-tab {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      transition: all 0.2s;
+    }
+    .lang-tab:hover {
+      color: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+    .lang-tab.active {
+      background: var(--color-accent);
+      color: var(--color-bg-deep);
+      border-color: var(--color-accent);
+    }
+    .code-block {
+      display: none;
+      background: var(--color-bg-console);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.2rem;
+      margin: 0.5rem 0 1rem;
+      overflow-x: auto;
+    }
+    .code-block.active {
+      display: block;
+    }
+    .code-block pre {
+      margin: 0;
+    }
+    .code-block code {
+      background: transparent;
+      color: var(--color-text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      white-space: pre;
+      display: block;
+    }
+    .code-block .lang-label {
+      font-size: 0.65rem;
+      color: var(--color-text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .lesson-exercise {
+      background: rgba(152,202,63,0.06);
+      border-left: 3px solid var(--color-accent);
+      padding: 0.8rem 1.2rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.2rem 0 0;
+      color: var(--color-text-secondary);
+      font-size: 0.9rem;
+    }
+    .lesson-exercise strong {
+      color: var(--color-accent);
+    }
+    .lesson-body h4 {
+      color: var(--color-accent);
+      margin: 1.2rem 0 0.5rem;
+    }
+    .lesson-body ul, .lesson-body ol {
+      padding-left: 1.5rem;
+      margin: 0.5rem 0 1rem;
+    }
+    .lesson-body li {
+      margin-bottom: 0.3rem;
+    }
+    .lesson-body p {
+      margin-bottom: 0.8rem;
+    }
+    .lesson-body .note {
+      background: rgba(152,202,63,0.08);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      margin: 1rem 0;
+      border: 1px solid rgba(152,202,63,0.2);
+    }
+    .lesson-body .note strong {
+      color: var(--color-accent);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <a href="index.html" class="logo-area">
+      <img class="logo-img" src="logo.png" alt="Logo de Kem">
+      <div>
+        <div class="brand-text">Kem</div>
+        <div class="brand-sub">aprende a programar</div>
+      </div>
+    </a>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Inicio</a>
+      <a href="aprender.html" class="active nav-btn-editor"><span>>_</span> Aprender</a>
+      <a href="docs.html">Documentación</a>
+      <a href="descargas.html">Descargas</a>
+      <a href="https://github.com/vyordan/kem" target="_blank">GitHub</a>
+      <a href="comunidad.html">Comunidad</a>
+    </div>
+  </nav>
+
+  <!-- ===== CLASES ===== -->
+  <section class="page-section">
+    <h1 class="page-title" style="text-align:center;">Aprende a programar desde cero</h1>
+    <p class="page-subtitle" style="text-align:center;">
+      Un curso completo de lógica de programación con el lenguaje KEM.
+      Cada lección incluye ejemplos en KEM, C++, Python y Java.
+    </p>
+
+    <div class="lessons-grid">
+
+      <!-- ======================================== -->
+      <!-- CLASE 1: Introducción a la programación -->
+      <!-- ======================================== -->
+      <details class="lesson-card" open>
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 1</span>
+          <h3>¿Qué es programar? Conoce KEM</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            <strong>Programar</strong> es dar instrucciones a una computadora para que realice tareas específicas.
+            Piensa en una receta de cocina: son pasos ordenados que, si se siguen, producen un plato.
+            De igual forma, un programa es una lista de pasos que la máquina ejecuta.
+          </p>
+          <p>
+            Los <strong>lenguajes de programación</strong> son los idiomas que usamos para escribir esas instrucciones.
+            KEM es un lenguaje creado especialmente para hispanohablantes: sus palabras clave están en español,
+            y puedes cambiarlas a cualquier idioma con un simple archivo JSON.
+          </p>
+          <p>
+            KEM es un lenguaje <strong>compilado JIT</strong> (Just-In-Time), lo que significa que tu código
+            se traduce a lenguaje máquina al momento de ejecutarlo, gracias a <strong>LLVM</strong>.
+            Esto combina la velocidad de lenguajes compilados con la facilidad de los interpretados.
+          </p>
+          <div class="note">
+            <strong>► Para recordar:</strong> Un programa es una secuencia de instrucciones que resuelve un problema.
+            KEM te permite escribir esas instrucciones en español.
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Piensa en una tarea cotidiana (por ejemplo, preparar un sándwich) y escribe
+            los pasos en orden. Eso es un algoritmo. Luego, busca en internet qué es un compilador y qué es un intérprete.
+          </div>
+        </div>
+      </details>
+
+      <!-- ======================================== -->
+      <!-- CLASE 2: Estructura de un programa KEM   -->
+      <!-- ======================================== -->
+      <details class="lesson-card">
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 2</span>
+          <h3>Tu primer programa: Hola Mundo</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            Todo programa en KEM necesita un bloque <code>inicio { }</code>. Dentro de él se escriben
+            las instrucciones que se ejecutarán al correr el programa.
+          </p>
+          <p>
+            Vamos a escribir el clásico "Hola, mundo!", que simplemente muestra un mensaje en la pantalla.
+          </p>
+          <h4>► Código en KEM</h4>
+          <div class="code-block active" data-lang="kem">
+            <pre><code>inicio {
+    imprimirLinea("¡Hola, mundo!")
+}</code></pre>
+          </div>
+          <p>
+            <code>imprimirLinea</code> es una función integrada que muestra texto y salta a la siguiente línea.
+            También existe <code>imprimir</code> que no salta.
+          </p>
+          <p>Ahora, veamos el mismo programa en otros lenguajes para que veas las diferencias:</p>
+
+          <div class="lang-tabs">
+            <button class="lang-tab active" onclick="switchLang(this, 'kem2')">KEM</button>
+            <button class="lang-tab" onclick="switchLang(this, 'cpp2')">C++</button>
+            <button class="lang-tab" onclick="switchLang(this, 'py2')">Python</button>
+            <button class="lang-tab" onclick="switchLang(this, 'java2')">Java</button>
+          </div>
+
+          <div class="code-block active" data-lang="kem2">
+            <span class="lang-label">KEM</span>
+            <pre><code>inicio {
+    imprimirLinea("¡Hola, mundo!")
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="cpp2">
+            <span class="lang-label">C++</span>
+            <pre><code>#include &lt;iostream&gt;
+int main() {
+    std::cout &lt;&lt; "¡Hola, mundo!" &lt;&lt; std::endl;
+    return 0;
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="py2">
+            <span class="lang-label">Python</span>
+            <pre><code>print("¡Hola, mundo!")</code></pre>
+          </div>
+          <div class="code-block" data-lang="java2">
+            <span class="lang-label">Java</span>
+            <pre><code>public class Main {
+    public static void main(String[] args) {
+        System.out.println("¡Hola, mundo!");
+    }
+}</code></pre>
+          </div>
+
+          <div class="note">
+            <strong>► Observa:</strong> En KEM no necesitas punto y coma, ni <code>#include</code>, ni una función <code>main</code>
+            separada. El bloque <code>inicio</code> ya es el punto de entrada.
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Modifica el programa para que muestre dos mensajes: "Bienvenido" y "A KEM" en líneas separadas.
+          </div>
+        </div>
+      </details>
+
+      <!-- ======================================== -->
+      <!-- CLASE 3: Variables y tipos de datos      -->
+      <!-- ======================================== -->
+      <details class="lesson-card">
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 3</span>
+          <h3>Guardando información: Variables</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            Las <strong>variables</strong> son como cajas donde guardamos datos. Cada variable tiene un <strong>tipo</strong>
+            que define qué clase de dato puede almacenar.
+          </p>
+          <p>En KEM tenemos cuatro tipos básicos:</p>
+          <ul>
+            <li><strong><code>entero</code></strong>: números sin decimal (ej. 5, -3, 0).</li>
+            <li><strong><code>decimal</code></strong>: números con punto decimal (ej. 3.14, -0.5).</li>
+            <li><strong><code>texto</code></strong>: cadenas de caracteres, siempre entre comillas dobles (ej. "Hola").</li>
+            <li><strong><code>booleano</code></strong>: solo dos valores: <code>verdadero</code> o <code>falso</code>.</li>
+          </ul>
+          <p>Para declarar una variable, escribes el tipo y luego el nombre, y opcionalmente la inicializas con <code>=</code>:</p>
+          <div class="code-block active" data-lang="kem3">
+            <pre><code>entero edad = 25
+decimal altura = 1.75
+texto nombre = "Ana"
+booleano esMayor = verdadero</code></pre>
+          </div>
+          <p>Puedes cambiar el valor de una variable después con la asignación:</p>
+          <div class="code-block active" data-lang="kem3b">
+            <pre><code>edad = 26
+altura = 1.80</code></pre>
+          </div>
+
+          <div class="lang-tabs">
+            <button class="lang-tab active" onclick="switchLang(this, 'kem3c')">KEM</button>
+            <button class="lang-tab" onclick="switchLang(this, 'cpp3')">C++</button>
+            <button class="lang-tab" onclick="switchLang(this, 'py3')">Python</button>
+            <button class="lang-tab" onclick="switchLang(this, 'java3')">Java</button>
+          </div>
+          <div class="code-block active" data-lang="kem3c">
+            <span class="lang-label">KEM</span>
+            <pre><code>entero edad = 25
+decimal altura = 1.75
+texto nombre = "Ana"
+booleano esMayor = verdadero</code></pre>
+          </div>
+          <div class="code-block" data-lang="cpp3">
+            <span class="lang-label">C++</span>
+            <pre><code>int edad = 25;
+double altura = 1.75;
+std::string nombre = "Ana";
+bool esMayor = true;</code></pre>
+          </div>
+          <div class="code-block" data-lang="py3">
+            <span class="lang-label">Python</span>
+            <pre><code>edad = 25
+altura = 1.75
+nombre = "Ana"
+esMayor = True</code></pre>
+          </div>
+          <div class="code-block" data-lang="java3">
+            <span class="lang-label">Java</span>
+            <pre><code>int edad = 25;
+double altura = 1.75;
+String nombre = "Ana";
+boolean esMayor = true;</code></pre>
+          </div>
+
+          <div class="note">
+            <strong>► Nota:</strong> En Python el tipo es dinámico, no necesitas declararlo explícitamente.
+            En KEM, C++ y Java el tipo es fijo.
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Declara variables para tu nombre, tu edad, tu estatura y si te gusta la pizza.
+            Luego, cambia la edad a un valor mayor.
+          </div>
+        </div>
+      </details>
+
+      <!-- ======================================== -->
+      <!-- CLASE 4: Entrada y salida                -->
+      <!-- ======================================== -->
+      <details class="lesson-card">
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 4</span>
+          <h3>Interactuando con el usuario</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            Hasta ahora solo mostramos mensajes. Ahora vamos a <strong>leer</strong> lo que el usuario escribe
+            para hacer programas más interactivos.
+          </p>
+          <p>KEM tiene funciones integradas para leer:</p>
+          <ul>
+            <li><code>leerLinea()</code> → devuelve un <code>texto</code> con todo lo que el usuario tecleó hasta presionar Enter.</li>
+            <li><code>leerEntero()</code> → devuelve un <code>entero</code>.</li>
+            <li><code>leerDecimal()</code> → devuelve un <code>decimal</code>.</li>
+          </ul>
+          <p>También tenemos funciones para imprimir números:</p>
+          <ul>
+            <li><code>imprimirEntero(entero)</code></li>
+            <li><code>imprimirDecimal(decimal)</code></li>
+          </ul>
+          <p>Ejemplo: preguntar el nombre y la edad, y saludar.</p>
+          <div class="code-block active" data-lang="kem4">
+            <pre><code>inicio {
+    imprimir("¿Cómo te llamas? ")
+    texto nombre = leerLinea()
+    imprimir("¿Cuántos años tienes? ")
+    entero edad = leerEntero()
+    imprimir("Hola, ")
+    imprimir(nombre)
+    imprimir(", el año que viene tendrás ")
+    imprimirEntero(edad + 1)
+    imprimirLinea(" años.")
+}</code></pre>
+          </div>
+
+          <div class="lang-tabs">
+            <button class="lang-tab active" onclick="switchLang(this, 'kem4b')">KEM</button>
+            <button class="lang-tab" onclick="switchLang(this, 'cpp4')">C++</button>
+            <button class="lang-tab" onclick="switchLang(this, 'py4')">Python</button>
+            <button class="lang-tab" onclick="switchLang(this, 'java4')">Java</button>
+          </div>
+          <div class="code-block active" data-lang="kem4b">
+            <span class="lang-label">KEM</span>
+            <pre><code>inicio {
+    imprimir("¿Cómo te llamas? ")
+    texto nombre = leerLinea()
+    imprimir("¿Cuántos años tienes? ")
+    entero edad = leerEntero()
+    imprimir("Hola, ")
+    imprimir(nombre)
+    imprimir(", el año que viene tendrás ")
+    imprimirEntero(edad + 1)
+    imprimirLinea(" años.")
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="cpp4">
+            <span class="lang-label">C++</span>
+            <pre><code>#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+int main() {
+    string nombre;
+    int edad;
+    cout &lt;&lt; "¿Cómo te llamas? ";
+    getline(cin, nombre);
+    cout &lt;&lt; "¿Cuántos años tienes? ";
+    cin &gt;&gt; edad;
+    cout &lt;&lt; "Hola, " &lt;&lt; nombre &lt;&lt; ", el año que viene tendrás " &lt;&lt; (edad+1) &lt;&lt; " años." &lt;&lt; endl;
+    return 0;
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="py4">
+            <span class="lang-label">Python</span>
+            <pre><code>nombre = input("¿Cómo te llamas? ")
+edad = int(input("¿Cuántos años tienes? "))
+print("Hola,", nombre, ", el año que viene tendrás", edad+1, "años.")</code></pre>
+          </div>
+          <div class="code-block" data-lang="java4">
+            <span class="lang-label">Java</span>
+            <pre><code>import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("¿Cómo te llamas? ");
+        String nombre = sc.nextLine();
+        System.out.print("¿Cuántos años tienes? ");
+        int edad = sc.nextInt();
+        System.out.println("Hola, " + nombre + ", el año que viene tendrás " + (edad + 1) + " años.");
+    }
+}</code></pre>
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Escribe un programa que pida dos números enteros y muestre su suma.
+          </div>
+        </div>
+      </details>
+
+      <!-- ======================================== -->
+      <!-- CLASE 5: Operadores y expresiones        -->
+      <!-- ======================================== -->
+      <details class="lesson-card">
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 5</span>
+          <h3>Operaciones con datos</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            Los <strong>operadores</strong> nos permiten realizar cálculos y comparaciones.
+          </p>
+          <h4>Operadores aritméticos:</h4>
+          <ul>
+            <li><code>+</code> (suma), <code>-</code> (resta), <code>*</code> (multiplicación), <code>/</code> (división), <code>%</code> (módulo o resto).</li>
+          </ul>
+          <p>
+            La división de enteros da un entero (trunca el decimal). Si quieres resultado decimal, al menos uno de los operandos debe ser <code>decimal</code>.
+          </p>
+          <h4>Operadores de comparación (resultan en booleano):</h4>
+          <ul>
+            <li><code>==</code> igual, <code>!=</code> diferente, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code></li>
+          </ul>
+          <h4>Operadores lógicos (sobre booleanos):</h4>
+          <ul>
+            <li><code>y</code> (AND), <code>o</code> (OR), <code>no</code> (NOT)</li>
+          </ul>
+          <p>Ejemplo: calcular el área de un rectángulo.</p>
+          <div class="code-block active" data-lang="kem5">
+            <pre><code>inicio {
+    imprimir("Base: ")
+    decimal base = leerDecimal()
+    imprimir("Altura: ")
+    decimal altura = leerDecimal()
+    decimal area = base * altura
+    imprimir("El área es: ")
+    imprimirDecimal(area)
+    imprimirLinea("")
+}</code></pre>
+          </div>
+          <div class="lang-tabs">
+            <button class="lang-tab active" onclick="switchLang(this, 'kem5b')">KEM</button>
+            <button class="lang-tab" onclick="switchLang(this, 'cpp5')">C++</button>
+            <button class="lang-tab" onclick="switchLang(this, 'py5')">Python</button>
+            <button class="lang-tab" onclick="switchLang(this, 'java5')">Java</button>
+          </div>
+          <div class="code-block active" data-lang="kem5b">
+            <span class="lang-label">KEM</span>
+            <pre><code>inicio {
+    decimal base = 5.0
+    decimal altura = 3.0
+    decimal area = base * altura
+    imprimirDecimal(area)  // muestra 15.000000
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="cpp5">
+            <span class="lang-label">C++</span>
+            <pre><code>#include &lt;iostream&gt;
+int main() {
+    double base = 5.0, altura = 3.0;
+    double area = base * altura;
+    std::cout &lt;&lt; area &lt;&lt; std::endl;
+    return 0;
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="py5">
+            <span class="lang-label">Python</span>
+            <pre><code>base = 5.0
+altura = 3.0
+area = base * altura
+print(area)</code></pre>
+          </div>
+          <div class="code-block" data-lang="java5">
+            <span class="lang-label">Java</span>
+            <pre><code>public class Main {
+    public static void main(String[] args) {
+        double base = 5.0;
+        double altura = 3.0;
+        double area = base * altura;
+        System.out.println(area);
+    }
+}</code></pre>
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Escribe un programa que pida dos números y diga si el primero es mayor, menor o igual que el segundo.
+          </div>
+        </div>
+      </details>
+
+      <!-- ======================================== -->
+      <!-- CLASE 6: Condicionales (si/sino)         -->
+      <!-- ======================================== -->
+      <details class="lesson-card">
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 6</span>
+          <h3>Tomando decisiones: si / sino</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            Los <strong>condicionales</strong> permiten ejecutar diferentes bloques de código según se cumpla o no una condición.
+          </p>
+          <p>La sintaxis en KEM:</p>
+          <div class="code-block active" data-lang="kem6">
+            <pre><code>si condicion {
+    // se ejecuta si condicion es verdadera
+} sino si otra_condicion {
+    // se ejecuta si la primera es falsa y esta es verdadera
+} sino {
+    // se ejecuta si todas las anteriores son falsas
+}</code></pre>
+          </div>
+          <p>Ejemplo: verificar si un número es positivo, negativo o cero.</p>
+          <div class="code-block active" data-lang="kem6b">
+            <pre><code>inicio {
+    imprimir("Ingresa un número: ")
+    entero n = leerEntero()
+    si n > 0 {
+        imprimirLinea("El número es positivo")
+    } sino si n < 0 {
+        imprimirLinea("El número es negativo")
+    } sino {
+        imprimirLinea("El número es cero")
+    }
+}</code></pre>
+          </div>
+
+          <div class="lang-tabs">
+            <button class="lang-tab active" onclick="switchLang(this, 'kem6c')">KEM</button>
+            <button class="lang-tab" onclick="switchLang(this, 'cpp6')">C++</button>
+            <button class="lang-tab" onclick="switchLang(this, 'py6')">Python</button>
+            <button class="lang-tab" onclick="switchLang(this, 'java6')">Java</button>
+          </div>
+          <div class="code-block active" data-lang="kem6c">
+            <span class="lang-label">KEM</span>
+            <pre><code>inicio {
+    entero n = 5
+    si n > 0 {
+        imprimirLinea("Positivo")
+    } sino si n < 0 {
+        imprimirLinea("Negativo")
+    } sino {
+        imprimirLinea("Cero")
+    }
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="cpp6">
+            <span class="lang-label">C++</span>
+            <pre><code>#include &lt;iostream&gt;
+int main() {
+    int n = 5;
+    if (n > 0) {
+        std::cout &lt;&lt; "Positivo" &lt;&lt; std::endl;
+    } else if (n < 0) {
+        std::cout &lt;&lt; "Negativo" &lt;&lt; std::endl;
+    } else {
+        std::cout &lt;&lt; "Cero" &lt;&lt; std::endl;
+    }
+    return 0;
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="py6">
+            <span class="lang-label">Python</span>
+            <pre><code>n = 5
+if n > 0:
+    print("Positivo")
+elif n < 0:
+    print("Negativo")
+else:
+    print("Cero")</code></pre>
+          </div>
+          <div class="code-block" data-lang="java6">
+            <span class="lang-label">Java</span>
+            <pre><code>public class Main {
+    public static void main(String[] args) {
+        int n = 5;
+        if (n > 0) {
+            System.out.println("Positivo");
+        } else if (n < 0) {
+            System.out.println("Negativo");
+        } else {
+            System.out.println("Cero");
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Pide un número y muestra si es par o impar (usa el operador <code>%</code>).
+          </div>
+        </div>
+      </details>
+
+      <!-- ======================================== -->
+      <!-- CLASE 7: Bucles (mientras y hasta)       -->
+      <!-- ======================================== -->
+      <details class="lesson-card">
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 7</span>
+          <h3>Repitiendo acciones: Bucles</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            Los <strong>bucles</strong> repiten un bloque de código varias veces. KEM tiene dos tipos:
+          </p>
+          <ul>
+            <li><code>mientras</code>: repite mientras una condición sea verdadera.</li>
+            <li><code>hasta</code>: recorre un rango de números enteros (como el <code>for</code> de otros lenguajes).</li>
+          </ul>
+          <h4>Ejemplo con mientras: contar del 1 al 5</h4>
+          <div class="code-block active" data-lang="kem7">
+            <pre><code>inicio {
+    entero contador = 1
+    mientras contador <= 5 {
+        imprimirEntero(contador)
+        imprimirLinea("")
+        contador = contador + 1
+    }
+}</code></pre>
+          </div>
+          <h4>Ejemplo con hasta: sumar los números del 1 al 10</h4>
+          <div class="code-block active" data-lang="kem7b">
+            <pre><code>inicio {
+    entero suma = 0
+    entero i
+    i = 1 hasta 11 {   // i toma valores 1,2,...,10
+        suma = suma + i
+    }
+    imprimir("La suma es: ")
+    imprimirEntero(suma)
+    imprimirLinea("")
+}</code></pre>
+          </div>
+          <p>El rango de <code>hasta</code> es <strong>inicio ≤ i &lt; fin</strong>. El valor final no se incluye.</p>
+
+          <div class="lang-tabs">
+            <button class="lang-tab active" onclick="switchLang(this, 'kem7c')">KEM (hasta)</button>
+            <button class="lang-tab" onclick="switchLang(this, 'cpp7')">C++ (for)</button>
+            <button class="lang-tab" onclick="switchLang(this, 'py7')">Python (for)</button>
+            <button class="lang-tab" onclick="switchLang(this, 'java7')">Java (for)</button>
+          </div>
+          <div class="code-block active" data-lang="kem7c">
+            <span class="lang-label">KEM</span>
+            <pre><code>entero suma = 0
+entero i
+i = 1 hasta 11 {
+    suma = suma + i
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="cpp7">
+            <span class="lang-label">C++</span>
+            <pre><code>int suma = 0;
+for (int i = 1; i &lt;= 10; i++) {
+    suma += i;
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="py7">
+            <span class="lang-label">Python</span>
+            <pre><code>suma = 0
+for i in range(1, 11):
+    suma += i</code></pre>
+          </div>
+          <div class="code-block" data-lang="java7">
+            <span class="lang-label">Java</span>
+            <pre><code>int suma = 0;
+for (int i = 1; i &lt;= 10; i++) {
+    suma += i;
+}</code></pre>
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Escribe un programa que muestre la tabla de multiplicar de un número dado (del 1 al 10) usando un bucle.
+          </div>
+        </div>
+      </details>
+
+      <!-- ======================================== -->
+      <!-- CLASE 8: Funciones y procedimientos      -->
+      <!-- ======================================== -->
+      <details class="lesson-card">
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 8</span>
+          <h3>Organizando código: Funciones</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            Las <strong>funciones</strong> son bloques de código reutilizables. Reciben datos (parámetros) y devuelven un resultado.
+            Los <strong>procedimientos</strong> son similares pero no devuelven nada (solo ejecutan acciones).
+          </p>
+          <p>Sintaxis de una función en KEM:</p>
+          <div class="code-block active" data-lang="kem8">
+            <pre><code>funcion nombre(param1 tipo, param2 tipo) tipo_retorno {
+    // cuerpo
+    devolver resultado
+}</code></pre>
+          </div>
+          <p>Ejemplo: función que suma dos números.</p>
+          <div class="code-block active" data-lang="kem8b">
+            <pre><code>funcion suma(entero a, entero b) entero {
+    devolver a + b
+}
+
+inicio {
+    entero resultado = suma(5, 3)
+    imprimirEntero(resultado)  // 8
+}</code></pre>
+          </div>
+          <p>Los <strong>procedimientos</strong> no usan <code>devolver</code> (o lo usan sin valor para salir temprano).</p>
+
+          <div class="lang-tabs">
+            <button class="lang-tab active" onclick="switchLang(this, 'kem8c')">KEM</button>
+            <button class="lang-tab" onclick="switchLang(this, 'cpp8')">C++</button>
+            <button class="lang-tab" onclick="switchLang(this, 'py8')">Python</button>
+            <button class="lang-tab" onclick="switchLang(this, 'java8')">Java</button>
+          </div>
+          <div class="code-block active" data-lang="kem8c">
+            <span class="lang-label">KEM</span>
+            <pre><code>funcion suma(entero a, entero b) entero {
+    devolver a + b
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="cpp8">
+            <span class="lang-label">C++</span>
+            <pre><code>int suma(int a, int b) {
+    return a + b;
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="py8">
+            <span class="lang-label">Python</span>
+            <pre><code>def suma(a, b):
+    return a + b</code></pre>
+          </div>
+          <div class="code-block" data-lang="java8">
+            <span class="lang-label">Java</span>
+            <pre><code>public static int suma(int a, int b) {
+    return a + b;
+}</code></pre>
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Escribe una función que reciba un número y devuelva <code>verdadero</code> si es par, <code>falso</code> si es impar.
+          </div>
+        </div>
+      </details>
+
+      <!-- ======================================== -->
+      <!-- CLASE 9: Parámetros por referencia       -->
+      <!-- ======================================== -->
+      <details class="lesson-card">
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 9</span>
+          <h3>Modificando variables externas</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            Normalmente, los parámetros se pasan por <strong>valor</strong>: la función recibe una copia del dato.
+            Si quieres modificar la variable original, usas <strong>referencia</strong>.
+          </p>
+          <p>En KEM, antepones <code>referencia</code> al tipo del parámetro.</p>
+          <p>Ejemplo: un procedimiento que intercambia dos números.</p>
+          <div class="code-block active" data-lang="kem9">
+            <pre><code>procedimiento intercambiar(referencia entero a, referencia entero b) {
+    entero temp = a
+    a = b
+    b = temp
+}
+
+inicio {
+    entero x = 5, y = 10
+    intercambiar(x, y)
+    // ahora x = 10, y = 5
+}</code></pre>
+          </div>
+          <p>Esto no es posible en Python (los tipos simples son inmutables) pero en C++ se usan referencias (<code>&</code>) y en Java se simula con arreglos o envoltorios.</p>
+          <div class="lang-tabs">
+            <button class="lang-tab active" onclick="switchLang(this, 'kem9b')">KEM</button>
+            <button class="lang-tab" onclick="switchLang(this, 'cpp9')">C++</button>
+            <button class="lang-tab" onclick="switchLang(this, 'java9')">Java (simulado)</button>
+          </div>
+          <div class="code-block active" data-lang="kem9b">
+            <span class="lang-label">KEM</span>
+            <pre><code>procedimiento intercambiar(referencia entero a, referencia entero b) {
+    entero temp = a
+    a = b
+    b = temp
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="cpp9">
+            <span class="lang-label">C++</span>
+            <pre><code>void intercambiar(int &a, int &b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="java9">
+            <span class="lang-label">Java</span>
+            <pre><code>// Java no tiene paso por referencia para tipos primitivos.
+// Se simula usando un arreglo de un elemento:
+static void intercambiar(int[] a, int[] b) {
+    int temp = a[0];
+    a[0] = b[0];
+    b[0] = temp;
+}
+// Uso: intercambiar(new int[]{x}, new int[]{y});</code></pre>
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Escribe un procedimiento que reciba un entero por referencia y lo duplique.
+          </div>
+        </div>
+      </details>
+
+      <!-- ======================================== -->
+      <!-- CLASE 10: Arreglos                       -->
+      <!-- ======================================== -->
+      <details class="lesson-card">
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 10</span>
+          <h3>Agrupando datos: Arreglos</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            Un <strong>arreglo</strong> es una colección de elementos del mismo tipo, almacenados en posiciones consecutivas.
+            Se accede a cada elemento mediante un índice (empezando en 0).
+          </p>
+          <p>En KEM, declaras un arreglo con <code>tipo nombre[tamaño]</code> y puedes inicializarlo.</p>
+          <div class="code-block active" data-lang="kem10">
+            <pre><code>entero numeros[5] = [10, 20, 30, 40, 50]
+texto nombres[3] = ["Ana", "Luis", "Carlos"]
+
+inicio {
+    entero primero = numeros[0]  // 10
+    imprimir(nombres[1])         // Luis
+    numeros[2] = 99              // modifica el tercer elemento
+}</code></pre>
+          </div>
+          <p>Recorrer un arreglo con un bucle:</p>
+          <div class="code-block active" data-lang="kem10b">
+            <pre><code>inicio {
+    entero nums[5] = [2, 4, 6, 8, 10]
+    entero i
+    i = 0 hasta 5 {
+        imprimirEntero(nums[i])
+        imprimirLinea("")
+    }
+}</code></pre>
+          </div>
+
+          <div class="lang-tabs">
+            <button class="lang-tab active" onclick="switchLang(this, 'kem10c')">KEM</button>
+            <button class="lang-tab" onclick="switchLang(this, 'cpp10')">C++</button>
+            <button class="lang-tab" onclick="switchLang(this, 'py10')">Python</button>
+            <button class="lang-tab" onclick="switchLang(this, 'java10')">Java</button>
+          </div>
+          <div class="code-block active" data-lang="kem10c">
+            <span class="lang-label">KEM</span>
+            <pre><code>entero nums[5] = [2, 4, 6, 8, 10]
+entero i
+i = 0 hasta 5 {
+    imprimirEntero(nums[i])
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="cpp10">
+            <span class="lang-label">C++</span>
+            <pre><code>int nums[5] = {2, 4, 6, 8, 10};
+for (int i = 0; i < 5; i++) {
+    std::cout << nums[i] << std::endl;
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="py10">
+            <span class="lang-label">Python</span>
+            <pre><code>nums = [2, 4, 6, 8, 10]
+for i in range(len(nums)):
+    print(nums[i])</code></pre>
+          </div>
+          <div class="code-block" data-lang="java10">
+            <span class="lang-label">Java</span>
+            <pre><code>int[] nums = {2, 4, 6, 8, 10};
+for (int i = 0; i < nums.length; i++) {
+    System.out.println(nums[i]);
+}</code></pre>
+          </div>
+          <div class="note">
+            <strong>► Importante:</strong> En KEM, el tamaño del arreglo debe ser una constante conocida en tiempo de compilación.
+            No hay arreglos dinámicos en esta versión.
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Declara un arreglo de 5 decimales, pide al usuario que los ingrese, y luego muestra el promedio.
+          </div>
+        </div>
+      </details>
+
+      <!-- ======================================== -->
+      <!-- CLASE 11: Estructuras                    -->
+      <!-- ======================================== -->
+      <details class="lesson-card">
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 11</span>
+          <h3>Datos compuestos: Estructuras</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            Las <strong>estructuras</strong> permiten agrupar varios campos de tipos distintos bajo un mismo nombre.
+            Son útiles para representar entidades del mundo real (ej. un punto, un libro, un estudiante).
+          </p>
+          <p>En KEM, se definen con <code>estructura</code> y se accede a los campos con <code>.</code></p>
+          <div class="code-block active" data-lang="kem11">
+            <pre><code>estructura Punto {
+    decimal x
+    decimal y
+}
+
+inicio {
+    Punto p
+    p.x = 3.5
+    p.y = 2.0
+    imprimirDecimal(p.x)
+}</code></pre>
+          </div>
+          <p>En esta versión de KEM, las estructuras son parciales (no verifican tipos de campos completamente).</p>
+          <div class="lang-tabs">
+            <button class="lang-tab active" onclick="switchLang(this, 'kem11b')">KEM</button>
+            <button class="lang-tab" onclick="switchLang(this, 'cpp11')">C++</button>
+            <button class="lang-tab" onclick="switchLang(this, 'py11')">Python (dataclass)</button>
+            <button class="lang-tab" onclick="switchLang(this, 'java11')">Java (class)</button>
+          </div>
+          <div class="code-block active" data-lang="kem11b">
+            <span class="lang-label">KEM</span>
+            <pre><code>estructura Punto {
+    decimal x
+    decimal y
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="cpp11">
+            <span class="lang-label">C++</span>
+            <pre><code>struct Punto {
+    double x;
+    double y;
+};</code></pre>
+          </div>
+          <div class="code-block" data-lang="py11">
+            <span class="lang-label">Python</span>
+            <pre><code>from dataclasses import dataclass
+@dataclass
+class Punto:
+    x: float
+    y: float</code></pre>
+          </div>
+          <div class="code-block" data-lang="java11">
+            <span class="lang-label">Java</span>
+            <pre><code>class Punto {
+    double x;
+    double y;
+}</code></pre>
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Define una estructura <code>Libro</code> con título (texto), autor (texto) y páginas (entero). Luego crea una variable de ese tipo y asígnale valores.
+          </div>
+        </div>
+      </details>
+
+      <!-- ======================================== -->
+      <!-- CLASE 12: Interoperabilidad con C        -->
+      <!-- ======================================== -->
+      <details class="lesson-card">
+        <summary class="lesson-header">
+          <span class="lesson-number">Clase 12</span>
+          <h3>Usar funciones de C (enlazar)</h3>
+          <span class="lesson-toggle"></span>
+        </summary>
+        <div class="lesson-body">
+          <p>
+            KEM puede llamar funciones escritas en C usando la palabra clave <code>enlazar</code>.
+            Esto abre un mundo de posibilidades porque puedes usar cualquier función de la biblioteca estándar de C.
+          </p>
+          <p>Sintaxis:</p>
+          <div class="code-block active" data-lang="kem12">
+            <pre><code>enlazar tipo nombre(parametros)</code></pre>
+          </div>
+          <p>Ejemplo: usar <code>sqrt</code> (raíz cuadrada) de la librería matemática.</p>
+          <div class="code-block active" data-lang="kem12b">
+            <pre><code>enlazar decimal sqrt(decimal)
+
+inicio {
+    decimal num = 16.0
+    decimal raiz = sqrt(num)
+    imprimirDecimal(raiz)  // 4.000000
+}</code></pre>
+          </div>
+          <p>También puedes usar <code>printf</code> aunque con limitaciones (no variádica).</p>
+          <div class="lang-tabs">
+            <button class="lang-tab active" onclick="switchLang(this, 'kem12c')">KEM</button>
+            <button class="lang-tab" onclick="switchLang(this, 'cpp12')">C++</button>
+            <button class="lang-tab" onclick="switchLang(this, 'py12')">Python</button>
+            <button class="lang-tab" onclick="switchLang(this, 'java12')">Java</button>
+          </div>
+          <div class="code-block active" data-lang="kem12c">
+            <span class="lang-label">KEM</span>
+            <pre><code>enlazar decimal sqrt(decimal)
+inicio {
+    decimal r = sqrt(25.0)
+    imprimirDecimal(r)
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="cpp12">
+            <span class="lang-label">C++</span>
+            <pre><code>#include &lt;cmath&gt;
+#include &lt;iostream&gt;
+int main() {
+    double r = sqrt(25.0);
+    std::cout &lt;&lt; r &lt;&lt; std::endl;
+}</code></pre>
+          </div>
+          <div class="code-block" data-lang="py12">
+            <span class="lang-label">Python</span>
+            <pre><code>import math
+r = math.sqrt(25.0)
+print(r)</code></pre>
+          </div>
+          <div class="code-block" data-lang="java12">
+            <span class="lang-label">Java</span>
+            <pre><code>public class Main {
+    public static void main(String[] args) {
+        double r = Math.sqrt(25.0);
+        System.out.println(r);
+    }
+}</code></pre>
+          </div>
+          <div class="lesson-exercise">
+            <strong>Ejercicio:</strong> Usa <code>enlazar</code> para declarar la función <code>pow(decimal, decimal)</code> y calcula 2 elevado a 8.
+          </div>
+        </div>
+      </details>
+
+    </div> <!-- fin lessons-grid -->
+
+    <!-- Mensaje final -->
+    <div style="text-align: center; margin-top: 4rem; padding: 2rem; background: var(--color-bg-card); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+      <h3 style="color: #fff;">¡Has completado las lecciones básicas de KEM!</h3>
+      <p style="color: var(--color-text-secondary);">
+        Ahora ya conoces los fundamentos de la programación. Te animamos a practicar creando tus propios programas y a explorar la
+        <a href="docs.html" style="color: var(--color-accent);">documentación completa</a> para profundizar.
+      </p>
+      <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-top: 1rem;">
+        Recuerda que KEM es open source. Puedes contribuir en
+        <a href="https://github.com/vyordan/kem" target="_blank" style="color: var(--color-accent);">GitHub</a>.
+      </p>
+    </div>
+
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <p><code>Kem-lang</code> · Compilador JIT en C++ con LLVM · open source</p>
+    <p><a href="index.html">volver al inicio</a></p>
+  </footer>
+
+</div>
+
+<!-- ===== SCRIPT para cambiar pestañas de lenguajes ===== -->
+<script>
+  function switchLang(btn, langId) {
+    // Encuentra el contenedor de las pestañas (el padre del botón)
+    const tabsContainer = btn.closest('.lesson-body').querySelector('.lang-tabs');
+    if (!tabsContainer) return;
+
+    // Remueve la clase 'active' de todos los botones de ese contenedor
+    tabsContainer.querySelectorAll('.lang-tab').forEach(tab => tab.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Encuentra todos los code-block dentro del mismo lesson-body
+    const body = btn.closest('.lesson-body');
+    const blocks = body.querySelectorAll('.code-block');
+    // Oculta todos y muestra solo el que coincide con el data-lang
+    blocks.forEach(block => {
+      block.classList.remove('active');
+      if (block.dataset.lang === langId) {
+        block.classList.add('active');
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

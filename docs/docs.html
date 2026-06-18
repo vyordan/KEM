@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentación · KEM</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Estilos adicionales para la documentación larga */
+    .doc-toc {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem 2rem;
+      margin: 2rem 0 3rem;
+    }
+    .doc-toc h2 {
+      color: var(--color-accent);
+      font-size: 1.1rem;
+      margin-bottom: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .doc-toc ul {
+      columns: 2 250px;
+      column-gap: 2rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .doc-toc ul li {
+      margin-bottom: 0.3rem;
+      break-inside: avoid;
+    }
+    .doc-toc ul li a {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color var(--transition-fast);
+    }
+    .doc-toc ul li a:hover {
+      color: var(--color-accent);
+    }
+    .doc-section {
+      scroll-margin-top: 80px;
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border);
+    }
+    .doc-section:first-of-type {
+      border-top: none;
+      margin-top: 0;
+    }
+    .doc-section h2 {
+      color: #fff;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+    .doc-section h3 {
+      color: var(--color-accent);
+      font-size: 1.2rem;
+      margin: 1.5rem 0 0.8rem;
+    }
+    .doc-section h4 {
+      color: var(--color-text-primary);
+      font-size: 1rem;
+      margin: 1rem 0 0.5rem;
+    }
+    .doc-section p {
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+    .doc-section ul, .doc-section ol {
+      color: var(--color-text-secondary);
+      padding-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .doc-section li {
+      margin-bottom: 0.3rem;
+    }
+    .doc-section code {
+      background: var(--color-code-bg);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--color-accent);
+    }
+    .doc-section .code-example {
+      margin: 1rem 0;
+    }
+    .doc-section .code-example pre code {
+      background: transparent;
+      color: var(--color-text-primary);
+    }
+    .doc-section .data-table {
+      margin: 1.5rem 0;
+    }
+    .doc-note {
+      background: rgba(152,202,63,0.08);
+      border-left: 3px solid var(--color-accent);
+      padding: 0.8rem 1.2rem;
+      border-radius: 0 8px 8px 0;
+      color: var(--color-text-secondary);
+      font-size: 0.9rem;
+      margin: 1rem 0;
+    }
+    .doc-note strong {
+      color: var(--color-accent);
+    }
+    @media (max-width: 600px) {
+      .doc-toc ul {
+        columns: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <a href="index.html" class="logo-area">
+      <img class="logo-img" src="logo.png" alt="Kem">
+      <div><div class="brand-text">Kem</div><div class="brand-sub">documentación</div></div>
+    </a>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Inicio</a>
+      <a href="aprender.html" class="nav-btn-editor"><span>>_</span> Aprender</a>
+      <a href="docs.html" class="active">Documentación</a>
+      <a href="descargas.html">Descargas</a>
+      <a href="https://github.com/vyordan/kem" target="_blank">GitHub</a>
+      <a href="comunidad.html">Comunidad</a>
+    </div>
+  </nav>
+
+  <!-- ===== CONTENIDO PRINCIPAL ===== -->
+  <section class="page-section">
+
+    <h1 class="page-title">Documentación completa del lenguaje</h1>
+    <p class="page-subtitle">
+      KEM es un lenguaje de programación compilado JIT con sintaxis en español.
+      El compilador toma archivos <code>.kem</code>, los analiza, verifica tipos, genera
+      LLVM IR y ejecuta el resultado directamente en la CPU — sin archivos intermedios.
+      El idioma de las palabras clave es configurable mediante un archivo JSON,
+      lo que permite usar el mismo compilador en cualquier idioma natural.
+    </p>
+
+    <!-- ===== ÍNDICE ===== -->
+    <div class="doc-toc">
+      <h2>Índice</h2>
+      <ul>
+        <li><a href="#estructura">1. Estructura de un programa</a></li>
+        <li><a href="#tipos">2. Tipos de datos</a></li>
+        <li><a href="#variables">3. Variables</a></li>
+        <li><a href="#operadores">4. Operadores</a></li>
+        <li><a href="#control">5. Flujo de control</a></li>
+        <li><a href="#funciones">6. Funciones</a></li>
+        <li><a href="#procedimientos">7. Procedimientos</a></li>
+        <li><a href="#arreglos">8. Arreglos</a></li>
+        <li><a href="#estructuras">9. Estructuras</a></li>
+        <li><a href="#builtins">10. Funciones de consola (built-in)</a></li>
+        <li><a href="#enlazar">11. Interoperabilidad con C (enlazar)</a></li>
+        <li><a href="#comentarios">12. Comentarios</a></li>
+        <li><a href="#continuacion">13. Reglas de continuación de línea</a></li>
+        <li><a href="#multiidioma">14. El sistema multi-idioma</a></li>
+        <li><a href="#que-se-puede">15. Qué se puede hacer</a></li>
+        <li><a href="#que-no">16. Qué NO se puede hacer todavía</a></li>
+        <li><a href="#errores">17. Mensajes de error</a></li>
+        <li><a href="#keywords">18. Referencia rápida de keywords</a></li>
+        <li><a href="#ebnf">Apéndice: Gramática EBNF resumida</a></li>
+      </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 1. ESTRUCTURA -->
+    <div id="estructura" class="doc-section">
+      <h2>1. Estructura de un programa</h2>
+      <p>Todo programa KEM tiene exactamente un bloque <code>inicio { }</code> que es el punto de entrada — el equivalente de <code>main</code> en C. Las funciones, procedimientos y estructuras se declaran fuera de <code>inicio</code>, antes o después de él.</p>
+      <div class="code-example">
+        <pre><code>// Declaraciones opcionales fuera de inicio
+funcion suma(entero a, entero b) entero {
+    devolver a + b
+}
+
+// Punto de entrada obligatorio
+inicio {
+    entero resultado = suma(3, 4)
+}</code></pre>
+      </div>
+      <p><strong>Reglas:</strong></p>
+      <ul>
+        <li>Debe haber exactamente un bloque <code>inicio { }</code> por archivo</li>
+        <li>Las funciones pueden llamarse entre sí sin importar el orden de declaración (el compilador hace una pasada de registro antes de analizar los cuerpos)</li>
+        <li>No existe un concepto de módulos o imports entre archivos en esta versión</li>
+      </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 2. TIPOS -->
+    <div id="tipos" class="doc-section">
+      <h2>2. Tipos de datos</h2>
+      <p>KEM tiene cuatro tipos primitivos y sus variantes en arreglo.</p>
+      <table class="data-table">
+        <thead><tr><th>Keyword KEM</th><th>Tipo LLVM IR</th><th>Descripción</th><th>Ejemplo</th></tr></thead>
+        <tbody>
+          <tr><td><code>entero</code></td><td><code>i64</code></td><td>Entero con signo de 64 bits</td><td><code>42</code>, <code>-7</code>, <code>0</code></td></tr>
+          <tr><td><code>decimal</code></td><td><code>double</code></td><td>Punto flotante de 64 bits (IEEE 754)</td><td><code>3.14</code>, <code>-0.5</code></td></tr>
+          <tr><td><code>booleano</code></td><td><code>i1</code></td><td>Verdadero o falso</td><td><code>verdadero</code>, <code>falso</code></td></tr>
+          <tr><td><code>texto</code></td><td><code>i8*</code></td><td>Puntero a cadena de caracteres</td><td><code>"hola mundo"</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Conversiones implícitas</h3>
+      <p>KEM realiza una sola conversión implícita: <strong>entero → decimal</strong> cuando una operación mezcla los dos tipos. En todos los demás casos los tipos deben coincidir exactamente.</p>
+      <div class="code-example">
+        <pre><code>decimal x = 5       // OK: 5 (entero) se convierte a 5.0 (decimal)
+decimal y = 3 + 1.5 // OK: 3 se convierte a 3.0, resultado es 4.5
+entero z = 3.14     // ERROR: decimal no se convierte a entero automáticamente</code></pre>
+      </div>
+      <h3>No existe conversión explícita todavía</h3>
+      <p>No hay una función de cast como <code>(entero)x</code>. Si necesitás convertir decimal a entero, usá una función auxiliar enlazada de la libc:</p>
+      <div class="code-example">
+        <pre><code>enlazar entero llrint(decimal)  // redondea decimal → entero
+
+inicio {
+    decimal pi = 3.14
+    entero aprox = llrint(pi)   // aprox = 3
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 3. VARIABLES -->
+    <div id="variables" class="doc-section">
+      <h2>3. Variables</h2>
+      <h3>Declaración</h3>
+      <p>La sintaxis es <strong>tipo primero</strong>, luego el nombre:</p>
+      <div class="code-example">
+        <pre><code>entero x           // sin inicializador — vale 0 por defecto
+entero y = 10
+decimal pi = 3.14159
+booleano activo = verdadero
+texto nombre = "KEM"</code></pre>
+      </div>
+      <p>El inicializador es opcional. Sin él, la variable se inicializa a cero (<code>0</code>, <code>0.0</code>, <code>falso</code>, o puntero nulo según el tipo).</p>
+      <h3>Asignación</h3>
+      <div class="code-example">
+        <pre><code>x = 20
+pi = 2.71828
+activo = falso</code></pre>
+      </div>
+      <h3>Scope</h3>
+      <p>Las variables pertenecen al bloque <code>{ }</code> donde se declaran. No son visibles fuera de ese bloque. Los bloques anidados pueden acceder a variables del bloque exterior.</p>
+      <div class="code-example">
+        <pre><code>inicio {
+    entero x = 10
+    si verdadero {
+        entero y = 20
+        x = x + y    // OK: x es visible desde el bloque exterior
+    }
+    // y no existe aquí — error semántico si intentás usarla
+}</code></pre>
+      </div>
+      <h3>Redeclaración</h3>
+      <p>No se puede declarar la misma variable dos veces en el mismo scope:</p>
+      <div class="code-example">
+        <pre><code>inicio {
+    entero x = 5
+    entero x = 10   // ERROR: 'x' ya fue declarado en este scope
+}</code></pre>
+      </div>
+      <p>En scopes distintos sí está permitido:</p>
+      <div class="code-example">
+        <pre><code>inicio {
+    si verdadero { entero x = 1 }   // OK
+    si verdadero { entero x = 2 }   // OK — scope distinto
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 4. OPERADORES -->
+    <div id="operadores" class="doc-section">
+      <h2>4. Operadores</h2>
+      <h3>Aritméticos</h3>
+      <table class="data-table">
+        <thead><tr><th>Operador</th><th>Descripción</th><th>Tipos válidos</th></tr></thead>
+        <tbody>
+          <tr><td><code>+</code></td><td>Suma</td><td>entero, decimal</td></tr>
+          <tr><td><code>-</code></td><td>Resta</td><td>entero, decimal</td></tr>
+          <tr><td><code>*</code></td><td>Multiplicación</td><td>entero, decimal</td></tr>
+          <tr><td><code>/</code></td><td>División</td><td>entero, decimal</td></tr>
+          <tr><td><code>%</code></td><td>Módulo (resto)</td><td>entero únicamente</td></tr>
+        </tbody>
+      </table>
+      <p><strong>División de enteros:</strong> es división entera — <code>7 / 2</code> da <code>3</code>, no <code>3.5</code>. Para obtener <code>3.5</code> se necesita al menos un operando decimal: <code>7.0 / 2</code>.</p>
+
+      <h3>Relacionales — retornan booleano</h3>
+      <table class="data-table">
+        <thead><tr><th>Operador</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>==</code></td><td>Igual a</td></tr>
+          <tr><td><code>!=</code></td><td>Diferente de</td></tr>
+          <tr><td><code>&lt;</code></td><td>Menor que</td></tr>
+          <tr><td><code>&gt;</code></td><td>Mayor que</td></tr>
+          <tr><td><code>&lt;=</code></td><td>Menor o igual</td></tr>
+          <tr><td><code>&gt;=</code></td><td>Mayor o igual</td></tr>
+        </tbody>
+      </table>
+      <p>Los operadores relacionales funcionan sobre <code>entero</code>, <code>decimal</code> y <code>booleano</code>. No se pueden comparar valores de tipos incompatibles.</p>
+
+      <h3>Lógicos — sobre booleanos</h3>
+      <table class="data-table">
+        <thead><tr><th>Operador</th><th>Descripción</th><th>Equivalente C</th></tr></thead>
+        <tbody>
+          <tr><td><code>y</code></td><td>AND lógico</td><td><code>&amp;&amp;</code></td></tr>
+          <tr><td><code>o</code></td><td>OR lógico</td><td><code>||</code></td></tr>
+          <tr><td><code>no</code></td><td>NOT lógico (unario)</td><td><code>!</code></td></tr>
+        </tbody>
+      </table>
+      <p><code>y</code> y <code>o</code> requieren que <strong>ambos operandos sean booleanos</strong>. No existe evaluación cortocircuito en esta versión.</p>
+      <div class="code-example">
+        <pre><code>booleano a = verdadero
+booleano b = falso
+booleano c = a y b       // falso
+booleano d = a o b       // verdadero
+booleano e = no a        // falso
+booleano f = 5 > 3 y 2 < 4   // verdadero</code></pre>
+      </div>
+
+      <h3>Precedencia (de menor a mayor)</h3>
+      <table class="data-table">
+        <thead><tr><th>Nivel</th><th>Operadores</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><code>o</code></td></tr>
+          <tr><td>2</td><td><code>y</code></td></tr>
+          <tr><td>3</td><td><code>==</code>, <code>!=</code></td></tr>
+          <tr><td>4</td><td><code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code></td></tr>
+          <tr><td>5</td><td><code>+</code>, <code>-</code></td></tr>
+          <tr><td>6</td><td><code>*</code>, <code>/</code>, <code>%</code></td></tr>
+          <tr><td>7</td><td><code>no</code>, <code>-</code> (unario)</td></tr>
+          <tr><td>8</td><td><code>.</code>, <code>[]</code>, <code>()</code></td></tr>
+        </tbody>
+      </table>
+      <p>Los paréntesis anulan la precedencia:</p>
+      <div class="code-example">
+        <pre><code>entero a = 2 + 3 * 4     // 14  (3*4 primero)
+entero b = (2 + 3) * 4   // 20  (paréntesis primero)</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 5. CONTROL -->
+    <div id="control" class="doc-section">
+      <h2>5. Flujo de control</h2>
+      <h3>si / sino</h3>
+      <div class="code-example">
+        <pre><code>si condicion {
+    // se ejecuta si condicion es verdadero
+}
+
+si condicion {
+    // rama verdadera
+} sino {
+    // rama falsa
+}
+
+si condicion1 {
+    // ...
+} sino si condicion2 {
+    // ...
+} sino {
+    // ...
+}</code></pre>
+      </div>
+      <p>La <strong>condición debe ser de tipo booleano</strong>. No se puede usar un entero directamente como condición (a diferencia de C):</p>
+      <div class="code-example">
+        <pre><code>entero x = 5
+si x { }          // ERROR: la condición del 'si' debe ser booleana
+si x != 0 { }    // OK</code></pre>
+      </div>
+
+      <h3>mientras</h3>
+      <p>Loop universal. Se ejecuta mientras la condición sea verdadera. Si la condición es falsa desde el principio, el cuerpo no se ejecuta nunca.</p>
+      <div class="code-example">
+        <pre><code>entero i = 0
+mientras i < 10 {
+    i = i + 1
+}
+
+// Loop infinito (con condición siempre verdadera)
+mientras verdadero {
+    // cuidado: no hay break en esta versión
+}</code></pre>
+      </div>
+
+      <h3>hasta / paso</h3>
+      <p>Equivalente al <code>for</code> de otros lenguajes. La variable de iteración <strong>debe estar declarada antes</strong> del bucle.</p>
+      <div class="code-example">
+        <pre><code>entero i           // declarar antes
+i = 0 hasta 10 {
+    // i toma valores: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    // (hasta 10 exclusivo)
+}
+
+// Con paso explícito:
+entero i
+i = 0 hasta 20 paso 2 {
+    // i: 0, 2, 4, 6, 8, 10, 12, 14, 16, 18
+}
+
+i = 10 hasta 0 paso -1 {
+    // i: 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+}</code></pre>
+      </div>
+      <p><strong>Sin paso</strong> el incremento por defecto es 1. La variable de iteración es de tipo <code>entero</code>. No se puede usar <code>decimal</code> como variable de iteración. El rango es <code>[inicio, fin)</code> — el valor <code>fin</code> nunca se alcanza (idéntico a <code>range()</code> en Python).</p>
+
+      <h3>No existe break ni continue</h3>
+      <p>En esta versión no hay instrucciones de salida temprana de loops. Para simular <code>break</code>, usá una variable booleana como condición:</p>
+      <div class="code-example">
+        <pre><code>booleano encontrado = falso
+entero i
+i = 0 hasta 100 {
+    si nums[i] == objetivo {
+        encontrado = verdadero
+    }
+    // sin break — el loop sigue pero no hace más trabajo útil
+    // esto es una limitación a resolver en versiones futuras
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 6. FUNCIONES -->
+    <div id="funciones" class="doc-section">
+      <h2>6. Funciones</h2>
+      <p>Una <code>funcion</code> siempre retorna un valor. Debe declarar su tipo de retorno y contener al menos un <code>devolver</code> en todos los caminos de ejecución.</p>
+      <div class="code-example">
+        <pre><code>funcion nombre(tipo param1, tipo param2) tipo_retorno {
+    devolver valor
+}</code></pre>
+      </div>
+      <h3>Ejemplos</h3>
+      <div class="code-example">
+        <pre><code>funcion suma(entero a, entero b) entero {
+    devolver a + b
+}
+
+funcion max(entero a, entero b) entero {
+    si a > b {
+        devolver a
+    }
+    devolver b
+}
+
+funcion factorial(entero n) entero {
+    si n == 0 {
+        devolver 1
+    }
+    devolver n * factorial(n - 1)
+}
+
+funcion esPar(entero n) booleano {
+    devolver n % 2 == 0
+}</code></pre>
+      </div>
+      <h3>Llamadas</h3>
+      <div class="code-example">
+        <pre><code>entero r = suma(3, 4)
+booleano par = esPar(10)
+entero f = factorial(factorial(3))   // llamadas anidadas OK</code></pre>
+      </div>
+      <h3>Recursión</h3>
+      <p>Las funciones pueden llamarse a sí mismas recursivamente sin ninguna declaración especial. También pueden llamarse entre sí (recursión mutua) porque el compilador registra todas las signaturas antes de analizar los cuerpos.</p>
+      <h3>Parámetros por referencia</h3>
+      <p>Con <code>referencia</code>, la función puede modificar la variable original del llamador:</p>
+      <div class="code-example">
+        <pre><code>procedimiento incrementar(referencia entero x) {
+    x = x + 1
+}
+
+inicio {
+    entero contador = 0
+    incrementar(contador)
+    // contador ahora vale 1
+}</code></pre>
+      </div>
+      <h3>Restricciones de funciones</h3>
+      <ul>
+        <li>Una <code>funcion</code> <strong>siempre</strong> debe retornar un valor — el analizador semántico verifica que haya <code>devolver</code> en todos los caminos posibles</li>
+        <li>El tipo del valor retornado debe coincidir con el tipo declarado (o ser convertible implícitamente entero→decimal)</li>
+        <li>No se pueden declarar funciones dentro de otras funciones</li>
+        <li>No hay funciones anónimas ni lambdas</li>
+      </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 7. PROCEDIMIENTOS -->
+    <div id="procedimientos" class="doc-section">
+      <h2>7. Procedimientos</h2>
+      <p>Un <code>procedimiento</code> no retorna valor. Es el equivalente de funciones <code>void</code> en C.</p>
+      <div class="code-example">
+        <pre><code>procedimiento nombre(tipo param) {
+    // cuerpo
+}</code></pre>
+      </div>
+      <h3>Ejemplos</h3>
+      <div class="code-example">
+        <pre><code>procedimiento saludar(texto nombre) {
+    printf(nombre)
+}
+
+procedimiento resetear(referencia entero x) {
+    x = 0
+}
+
+procedimiento intercambiar(referencia entero a, referencia entero b) {
+    entero temp = a
+    a = b
+    b = temp
+}</code></pre>
+      </div>
+      <h3>devolver en procedimientos</h3>
+      <p>Se puede usar <code>devolver</code> sin valor en un procedimiento para salir anticipadamente (equivalente a <code>return;</code> en C):</p>
+      <div class="code-example">
+        <pre><code>procedimiento procesar(entero x) {
+    si x < 0 {
+        devolver    // salida temprana
+    }
+    // ... resto del procesamiento
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 8. ARREGLOS -->
+    <div id="arreglos" class="doc-section">
+      <h2>8. Arreglos</h2>
+      <p>KEM soporta arreglos <strong>unidimensionales</strong> de tipo fijo. El tamaño se declara en tiempo de compilación y no puede cambiar.</p>
+      <h3>Declaración</h3>
+      <div class="code-example">
+        <pre><code>entero nums[5]                      // arreglo de 5 enteros, inicializados a 0
+entero primos[6] = [2, 3, 5, 7, 11, 13]
+decimal puntos[3] = [1.0, 2.5, 3.7]
+booleano flags[4] = [verdadero, falso, verdadero, verdadero]</code></pre>
+      </div>
+      <h3>Acceso y modificación</h3>
+      <p>Los índices empiezan en <strong>0</strong>:</p>
+      <div class="code-example">
+        <pre><code>entero primero = primos[0]   // 2
+entero tercero = primos[2]   // 5
+primos[0] = 99               // modificar</code></pre>
+      </div>
+      <p>El índice debe ser de tipo <code>entero</code>. No hay verificación de límites en tiempo de ejecución — acceder fuera del rango es comportamiento indefinido (igual que en C).</p>
+      <h3>Arreglos en funciones</h3>
+      <p>Los arreglos se declaran localmente dentro de funciones. No se pueden pasar arreglos completos como argumentos en esta versión — solo elementos individuales.</p>
+      <div class="code-example">
+        <pre><code>funcion suma_arreglo() entero {
+    entero nums[5] = [1, 2, 3, 4, 5]
+    entero suma = 0
+    entero i
+    i = 0 hasta 5 {
+        suma = suma + nums[i]
+    }
+    devolver suma
+}</code></pre>
+      </div>
+      <h3>Restricciones de arreglos</h3>
+      <ul>
+        <li>El tamaño debe ser un <strong>literal entero positivo</strong> conocido en tiempo de compilación</li>
+        <li>No hay arreglos dinámicos (sin <code>new</code> ni <code>malloc</code>)</li>
+        <li>No hay arreglos multidimensionales — solo unidimensionales</li>
+        <li>No se pueden pasar arreglos como parámetros directamente</li>
+      </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 9. ESTRUCTURAS -->
+    <div id="estructuras" class="doc-section">
+      <h2>9. Estructuras</h2>
+      <p>Las estructuras agrupan campos de distintos tipos bajo un nombre.</p>
+      <div class="code-example">
+        <pre><code>estructura Nombre {
+    tipo campo1
+    tipo campo2
+}</code></pre>
+      </div>
+      <h3>Ejemplo</h3>
+      <div class="code-example">
+        <pre><code>estructura Punto {
+    decimal x
+    decimal y
+}
+
+estructura Persona {
+    texto nombre
+    entero edad
+    booleano activo
+}</code></pre>
+      </div>
+      <h3>Uso</h3>
+      <div class="code-example">
+        <pre><code>Punto origen
+origen.x = 0.0
+origen.y = 0.0
+
+Punto p
+p.x = 3.0
+p.y = 4.0
+
+decimal distancia = p.x * p.x + p.y * p.y</code></pre>
+      </div>
+      <h3>Estado actual de las estructuras</h3>
+      <p>El soporte de estructuras en esta versión es <strong>parcial</strong>:</p>
+      <ul>
+        <li>Se pueden declarar estructuras y acceder a sus campos con <code>.</code></li>
+        <li>El sistema de tipos de usuario aún no está completamente integrado con el analizador semántico — el compilador acepta la sintaxis pero no verifica que los campos existan ni sus tipos</li>
+        <li>No se pueden pasar estructuras como parámetros por valor</li>
+        <li>No se pueden usar como tipo de retorno de funciones</li>
+      </ul>
+      <p>Las estructuras están diseñadas para ser completadas en la siguiente fase.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 10. BUILTINS -->
+    <div id="builtins" class="doc-section">
+      <h2>10. Funciones de consola (built-in)</h2>
+      <div class="doc-note">
+        <strong>Nota:</strong> Estas funciones quizá sean quitadas más adelante y se incluyan cuando ya tengamos una librería estándar.
+      </div>
+      <p>KEM incluye funciones de entrada/salida integradas directamente en el compilador. No requieren <code>enlazar</code> ni ninguna declaración especial. Están disponibles en cualquier parte del programa.</p>
+      <h3>Salida</h3>
+      <div class="code-example">
+        <pre><code>imprimir(texto)          // imprime el texto sin salto de línea al final
+imprimirLinea(texto)     // imprime el texto con salto de línea al final
+imprimirEntero(entero)   // imprime un entero en formato decimal
+imprimirDecimal(decimal) // imprime un decimal con 6 cifras decimales</code></pre>
+      </div>
+      <h4>Ejemplos</h4>
+      <div class="code-example">
+        <pre><code>inicio {
+    imprimir("Hola, ")
+    imprimirLinea("mundo!")          // salida: Hola, mundo!
+
+    imprimirEntero(42)               // salida: 42
+    imprimirEntero(-7)               // salida: -7
+
+    imprimirDecimal(3.14159)         // salida: 3.141590
+    imprimirDecimal(2.0)             // salida: 2.000000
+
+    imprimir("resultado = ")
+    imprimirEntero(3 + 4 * 2)        // salida: resultado = 11
+}</code></pre>
+      </div>
+      <h3>Entrada</h3>
+      <div class="code-example">
+        <pre><code>leerLinea()   → texto    // lee una línea completa de stdin
+leerEntero()  → entero   // lee un número entero de stdin
+leerDecimal() → decimal  // lee un número decimal de stdin</code></pre>
+      </div>
+      <h4>Ejemplo</h4>
+      <div class="code-example">
+        <pre><code>inicio {
+    imprimir("Ingresa tu nombre: ")
+    texto nombre = leerLinea()
+    imprimir("Hola, ")
+    imprimirLinea(nombre)
+
+    imprimir("Ingresa un numero: ")
+    entero n = leerEntero()
+    imprimir("El doble es: ")
+    imprimirEntero(n * 2)
+    imprimirLinea("")
+
+    imprimir("Ingresa un decimal: ")
+    decimal d = leerDecimal()
+    imprimirDecimal(d * d)
+}</code></pre>
+      </div>
+      <h3>Restricciones</h3>
+      <ul>
+        <li><code>imprimir</code> e <code>imprimirLinea</code> solo aceptan <code>texto</code> — para imprimir números usar <code>imprimirEntero</code> o <code>imprimirDecimal</code></li>
+        <li><code>leerEntero</code> y <code>leerDecimal</code> no validan la entrada — si el usuario escribe letras el comportamiento es indefinido</li>
+        <li><code>imprimirDecimal</code> siempre muestra 6 cifras decimales</li>
+      </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 11. ENLAZAR -->
+    <div id="enlazar" class="doc-section">
+      <h2>11. Interoperabilidad con C (<code>enlazar</code>)</h2>
+      <p><code>enlazar</code> declara una función externa implementada en C (o cualquier librería del sistema) que el JIT resuelve en tiempo de ejecución.</p>
+      <div class="code-example">
+        <pre><code>enlazar tipo_retorno nombre_funcion(tipo1, tipo2, ...)</code></pre>
+      </div>
+      <p>El JIT busca el símbolo automáticamente en las librerías cargadas en memoria (libc, libm, etc.) — no hay que especificar de dónde viene.</p>
+      <h3>Funciones de la libc disponibles</h3>
+      <div class="code-example">
+        <pre><code>enlazar vacio printf(texto)
+enlazar entero puts(texto)
+enlazar entero strlen(texto)
+enlazar decimal sin(decimal)
+enlazar decimal cos(decimal)
+enlazar decimal sqrt(decimal)
+enlazar decimal pow(decimal, decimal)
+enlazar entero abs(entero)
+enlazar vacio exit(entero)
+enlazar entero llrint(decimal)     // decimal → entero (redondeo)</code></pre>
+      </div>
+      <h4>Ejemplo completo con printf</h4>
+      <div class="code-example">
+        <pre><code>enlazar vacio printf(texto)
+
+funcion fibonacci(entero n) entero {
+    si n < 2 { devolver n }
+    devolver fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+inicio {
+    printf("Calculando fibonacci(10)...\n")
+    entero r = fibonacci(10)
+    printf("Resultado calculado\n")
+}</code></pre>
+      </div>
+      <h3>Limitación importante: printf variádico</h3>
+      <p><code>printf</code> en C acepta número variable de argumentos (<code>printf("%d", x)</code>). KEM aún no soporta funciones variádicas. Solo se puede usar <code>printf</code> con un string literal — no se pueden formatear números directamente.</p>
+      <p>Para imprimir números, usá <code>puts</code> combinado con conversiones, o declaraciones separadas:</p>
+      <div class="code-example">
+        <pre><code>// Esto NO funciona (variádico):
+// printf("%d\n", resultado)
+
+// Esto SÍ funciona (string fijo):
+enlazar vacio printf(texto)
+inicio {
+    printf("El programa termino\n")
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 12. COMENTARIOS -->
+    <div id="comentarios" class="doc-section">
+      <h2>12. Comentarios</h2>
+      <p>KEM soporta cuatro estilos de comentarios, todos ignorados por el compilador:</p>
+      <div class="code-example">
+        <pre><code>// Comentario de línea estilo C/C++
+
+/* Comentario de bloque
+   multilínea estilo C */
+
+comentario Esto también es un comentario de línea
+
+comentario{
+    Esto es un bloque
+    de comentario
+    estilo KEM
+}</code></pre>
+      </div>
+      <p>Los comentarios <code>comentario</code> y <code>comentario{ }</code> son la forma nativa del lenguaje — pensados para hispanohablantes que prefieren no recordar <code>//</code> y <code>/* */</code>.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 13. CONTINUACIÓN -->
+    <div id="continuacion" class="doc-section">
+      <h2>13. Reglas de continuación de línea</h2>
+      <p>KEM <strong>no usa punto y coma</strong>. El compilador determina el fin de una sentencia por el salto de línea, con estas excepciones donde la línea continúa en la siguiente:</p>
+      <ol>
+        <li>La línea termina en un operador binario: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>%</code>, <code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>y</code>, <code>o</code>, <code>=</code>, <code>,</code></li>
+        <li>Hay paréntesis <code>( )</code> o corchetes <code>[ ]</code> abiertos sin cerrar</li>
+        <li>La línea termina en <code>{</code></li>
+      </ol>
+      <div class="code-example">
+        <pre><code>// Esto es una sola expresión (termina en operador):
+entero resultado = 1 +
+                   2 +
+                   3
+
+// Esto es una sola expresión (paréntesis abierto):
+entero suma = (a +
+               b +
+               c)
+
+// Estas son DOS sentencias separadas:
+entero x = 5
+entero y = 10</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 14. MULTI-IDIOMA -->
+    <div id="multiidioma" class="doc-section">
+      <h2>14. El sistema multi-idioma</h2>
+      <p>El compilador carga un archivo JSON que mapea palabras del idioma elegido a los tipos de token internos. Esto permite que el mismo compilador procese código en cualquier idioma natural.</p>
+      <div class="code-example">
+        <pre><code>./kem programa.kem                          # español (por defecto)
+./kem --lang=langs/english.json prog.kem    # inglés</code></pre>
+      </div>
+      <h3>Crear un archivo de idioma</h3>
+      <p>Copiar <code>langs/espanol.json</code> y reemplazar las palabras:</p>
+      <div class="code-example">
+        <pre><code>{
+  "_nombre": "mi_idioma",
+
+  "funcion":       "KW_FUNCION",
+  "procedimiento": "KW_PROC",
+  "devolver":      "KW_DEVOLVER",
+  "inicio":        "KW_INICIO",
+  "si":            "KW_SI",
+  "sino":          "KW_SINO",
+  "mientras":      "KW_MIENTRAS",
+  "hasta":         "KW_HASTA",
+  "paso":          "KW_PASO",
+  "entero":        "KW_ENTERO",
+  "decimal":       "KW_DECIMAL",
+  "texto":         "KW_TEXTO",
+  "booleano":      "KW_BOOLEANO",
+  "verdadero":     "KW_VERDADERO",
+  "falso":         "KW_FALSO",
+  "y":             "KW_Y",
+  "o":             "KW_O",
+  "no":            "KW_NO",
+  "estructura":    "KW_ESTRUCTURA",
+  "referencia":    "KW_REF",
+  "enlazar":       "KW_ENLAZAR"
+}</code></pre>
+      </div>
+      <p>El compilador valida que estén presentes las 21 keywords obligatorias y lanza un error descriptivo si falta alguna.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 15. QUÉ SE PUEDE -->
+    <div id="que-se-puede" class="doc-section">
+      <h2>15. Qué se puede hacer</h2>
+      <p>Lista completa de lo que KEM soporta en esta versión:</p>
+      <h3>Tipos y valores</h3>
+      <ul>
+        <li>Literales enteros: <code>0</code>, <code>42</code>, <code>-7</code>, <code>1000000</code></li>
+        <li>Literales decimales: <code>3.14</code>, <code>-0.5</code>, <code>1.0</code></li>
+        <li>Literales booleanos: <code>verdadero</code>, <code>falso</code></li>
+        <li>Literales de texto: <code>"hola"</code>, <code>""</code>, <code>"con\nnewline"</code></li>
+        <li>Secuencias de escape en strings: <code>\n</code>, <code>\t</code>, <code>\"</code>, <code>\\</code></li>
+      </ul>
+      <h3>Operaciones</h3>
+      <ul>
+        <li>Aritmética completa sobre enteros y decimales</li>
+        <li>Conversión implícita entero → decimal en operaciones mixtas</li>
+        <li>Comparaciones entre tipos compatibles</li>
+        <li>Lógica booleana con <code>y</code>, <code>o</code>, <code>no</code></li>
+        <li>Negación unaria <code>-</code></li>
+      </ul>
+      <h3>Control de flujo</h3>
+      <ul>
+        <li><code>si</code> / <code>sino si</code> / <code>sino</code> anidados a cualquier profundidad</li>
+        <li><code>mientras</code> con cualquier condición booleana</li>
+        <li><code>hasta</code> / <code>paso</code> con enteros</li>
+        <li>Recursión (incluida recursión mutua entre funciones)</li>
+      </ul>
+      <h3>Funciones y procedimientos</h3>
+      <ul>
+        <li>Funciones con cualquier número de parámetros</li>
+        <li>Procedimientos (sin retorno)</li>
+        <li>Parámetros por referencia</li>
+        <li>Llamadas recursivas y mutualmente recursivas</li>
+        <li>Forward declarations automáticas</li>
+      </ul>
+      <h3>Arreglos</h3>
+      <ul>
+        <li>Arreglos de <code>entero</code>, <code>decimal</code>, <code>booleano</code>, <code>texto</code></li>
+        <li>Tamaño fijo declarado en tiempo de compilación</li>
+        <li>Inicializadores con lista de valores</li>
+        <li>Acceso por índice entero</li>
+        <li>Modificación de elementos</li>
+      </ul>
+      <h3>Estructuras</h3>
+      <ul>
+        <li>Declaración con campos tipados</li>
+        <li>Acceso a campos con <code>.</code></li>
+      </ul>
+      <h3>Interoperabilidad</h3>
+      <ul>
+        <li><code>enlazar</code> para llamar cualquier función de la libc</li>
+        <li>Strings como <code>i8*</code> compatibles con C</li>
+      </ul>
+      <h3>Herramientas</h3>
+      <ul>
+        <li><code>--emit-tokens</code>: ver la tokenización</li>
+        <li><code>--emit-ast</code>: ver el árbol sintáctico</li>
+        <li><code>--emit-ir</code>: ver el LLVM IR generado</li>
+        <li><code>--benchmark</code>: medir tiempos por fase</li>
+        <li><code>--lang</code>: cambiar el idioma del lenguaje</li>
+      </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 16. QUÉ NO -->
+    <div id="que-no" class="doc-section">
+      <h2>16. Qué NO se puede hacer todavía</h2>
+      <p>Limitaciones de la versión actual, planificadas para versiones futuras:</p>
+      <h3>Control de flujo</h3>
+      <ul>
+        <li>No hay <code>break</code> ni <code>continue</code> en loops</li>
+        <li>No hay <code>switch</code> / <code>cuando</code></li>
+        <li>No hay goto</li>
+      </ul>
+      <h3>Tipos</h3>
+      <ul>
+        <li>No hay conversión explícita de tipos (cast)</li>
+        <li>No hay tipos genéricos o templates</li>
+        <li>No hay tipos de usuario completos (structs parcialmente implementadas)</li>
+        <li>No hay punteros explícitos (solo <code>referencia</code>)</li>
+        <li>No hay manejo de nulos / <code>nil</code></li>
+      </ul>
+      <h3>Funciones</h3>
+      <ul>
+        <li>No hay funciones variádicas (impide <code>printf</code> con formato)</li>
+        <li>No hay funciones anónimas ni lambdas</li>
+        <li>No hay funciones como valores (no son first-class)</li>
+        <li>No hay parámetros con valores por defecto</li>
+        <li>No hay sobrecarga de funciones</li>
+      </ul>
+      <h3>Arreglos y datos</h3>
+      <ul>
+        <li>No hay arreglos multidimensionales</li>
+        <li>No hay arreglos dinámicos (sin <code>new</code> / <code>malloc</code>)</li>
+        <li>No se pueden pasar arreglos como parámetros</li>
+        <li>No hay strings mutables ni concatenación de strings</li>
+      </ul>
+      <h3>Organización</h3>
+      <ul>
+        <li>No hay módulos ni <code>importar</code></li>
+        <li>No hay espacios de nombres</li>
+        <li>No hay archivos múltiples en un mismo programa</li>
+      </ul>
+      <h3>Orientación a objetos</h3>
+      <ul>
+        <li>No hay clases ni métodos</li>
+        <li>No hay herencia</li>
+        <li>No hay interfaces</li>
+      </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 17. ERRORES -->
+    <div id="errores" class="doc-section">
+      <h2>17. Mensajes de error</h2>
+      <p>KEM produce mensajes de error en español con la fase donde ocurrió, la línea y columna exacta:</p>
+      <div class="code-example">
+        <pre><code>Error [Léxico] línea 5, col 12: Carácter inesperado '@'
+Error [Sintáctico] línea 8, col 3: Se esperaba '{' para abrir el bloque
+Error [Semántico] línea 12, col 5: Variable 'x' no declarada
+Error [Semántico] línea 15, col 8: No se puede sumar 'entero' y 'texto'
+Error [Semántico] línea 20, col 1: La función 'calcular' no siempre retorna un valor
+Error [Semántico] línea 25, col 10: 'suma' espera 2 argumento(s), recibió 3</code></pre>
+      </div>
+      <p>El compilador intenta <strong>recuperarse</strong> de errores sintácticos para reportar múltiples problemas en una sola pasada en lugar de detenerse en el primero.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 18. KEYWORDS -->
+    <div id="keywords" class="doc-section">
+      <h2>18. Referencia rápida de keywords</h2>
+      <table class="data-table">
+        <thead><tr><th>Keyword</th><th>Categoría</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>inicio</code></td><td>Estructura</td><td>Punto de entrada del programa</td></tr>
+          <tr><td><code>funcion</code></td><td>Funciones</td><td>Declara una función con retorno</td></tr>
+          <tr><td><code>procedimiento</code></td><td>Funciones</td><td>Declara una función sin retorno</td></tr>
+          <tr><td><code>devolver</code></td><td>Funciones</td><td>Retorna un valor (o sale del proc)</td></tr>
+          <tr><td><code>referencia</code></td><td>Funciones</td><td>Pasar parámetro por referencia</td></tr>
+          <tr><td><code>entero</code></td><td>Tipos</td><td>Entero de 64 bits</td></tr>
+          <tr><td><code>decimal</code></td><td>Tipos</td><td>Punto flotante de 64 bits</td></tr>
+          <tr><td><code>texto</code></td><td>Tipos</td><td>Cadena de caracteres</td></tr>
+          <tr><td><code>booleano</code></td><td>Tipos</td><td>Verdadero o falso</td></tr>
+          <tr><td><code>verdadero</code></td><td>Literales</td><td>Valor booleano true</td></tr>
+          <tr><td><code>falso</code></td><td>Literales</td><td>Valor booleano false</td></tr>
+          <tr><td><code>si</code></td><td>Control</td><td>Condicional</td></tr>
+          <tr><td><code>sino</code></td><td>Control</td><td>Rama alternativa del condicional</td></tr>
+          <tr><td><code>mientras</code></td><td>Control</td><td>Loop con condición booleana</td></tr>
+          <tr><td><code>hasta</code></td><td>Control</td><td>Loop con rango numérico</td></tr>
+          <tr><td><code>paso</code></td><td>Control</td><td>Incremento del bucle hasta</td></tr>
+          <tr><td><code>y</code></td><td>Lógica</td><td>AND lógico (ambos operandos booleanos)</td></tr>
+          <tr><td><code>o</code></td><td>Lógica</td><td>OR lógico (ambos operandos booleanos)</td></tr>
+          <tr><td><code>no</code></td><td>Lógica</td><td>NOT lógico (operando booleano)</td></tr>
+          <tr><td><code>estructura</code></td><td>Tipos compuestos</td><td>Define un tipo con campos</td></tr>
+          <tr><td><code>enlazar</code></td><td>Interop</td><td>Declara una función externa de C</td></tr>
+          <tr><td><code>comentario</code></td><td>Comentarios</td><td>Comentario de línea o bloque</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- APÉNDICE: EBNF -->
+    <div id="ebnf" class="doc-section">
+      <h2>Apéndice: Gramática EBNF resumida</h2>
+      <div class="code-example">
+        <pre><code>programa      = { declaracion_top } bloque_inicio EOF ;
+bloque_inicio = "inicio" bloque ;
+declaracion   = def_funcion | def_proc | def_struct | decl_enlace ;
+
+def_funcion   = "funcion" IDENT "(" params ")" tipo bloque ;
+def_proc      = "procedimiento" IDENT "(" params ")" bloque ;
+def_struct    = "estructura" IDENT "{" { campo } "}" ;
+decl_enlace   = "enlazar" tipo IDENT "(" [ tipos ] ")" ;
+
+params        = [ param { "," param } ] ;
+param         = [ "referencia" ] tipo IDENT ;
+tipo          = "entero" | "decimal" | "texto" | "booleano"
+              | tipo "[" ENTERO_LIT "]" ;
+
+bloque        = "{" { sentencia } "}" ;
+sentencia     = decl_var | decl_arr | asignacion | sent_si
+              | sent_mientras | sent_hasta | sent_devolver
+              | llamada_stmt | bloque ;
+
+decl_var      = tipo IDENT [ "=" expresion ] ;
+decl_arr      = tipo IDENT "[" ENTERO_LIT "]" [ "=" "[" exprs "]" ] ;
+asignacion    = lvalue "=" expresion ;
+sent_si       = "si" expresion bloque [ "sino" ( sent_si | bloque ) ] ;
+sent_mientras = "mientras" expresion bloque ;
+sent_hasta    = IDENT "=" expr "hasta" expr [ "paso" expr ] bloque ;
+sent_devolver = "devolver" [ expresion ] ;
+
+expresion     = expr_o ;
+expr_o        = expr_y { "o" expr_y } ;
+expr_y        = expr_eq { "y" expr_eq } ;
+expr_eq       = expr_rel { ( "==" | "!=" ) expr_rel } ;
+expr_rel      = expr_sum { ( "&lt;" | "&gt;" | "&lt;=" | "&gt;=" ) expr_sum } ;
+expr_sum      = expr_mul { ( "+" | "-" ) expr_mul } ;
+expr_mul      = expr_una { ( "*" | "/" | "%" ) expr_una } ;
+expr_una      = "no" expr_una | "-" expr_una | expr_post ;
+expr_post     = expr_prim { "." IDENT | "[" expr "]" } ;
+expr_prim     = literal | IDENT | IDENT "(" exprs ")" | "(" expr ")" ;
+
+literal       = ENTERO_LIT | DECIMAL_LIT | TEXTO_LIT
+              | "verdadero" | "falso" ;</code></pre>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <p><code>Kem-lang</code> · Compilador JIT en C++ con LLVM · open source</p>
+    <p>
+      <a href="https://github.com/vyordan/kem" target="_blank">GitHub</a> ·
+      <a href="index.html">volver al inicio</a>
+    </p>
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,11 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KEM</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>KEM</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>KEM</h1>
+
+<div class="container">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <a href="index.html" class="logo-area">
+      <img class="logo-img" src="logo.png" alt="Logo de Kem">
+      <div>
+        <div class="brand-text">Kem</div>
+        <div class="brand-sub">compilador JIT · C++/LLVM</div>
+      </div>
+    </a>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" class="active">Inicio</a>
+      <a href="aprender.html" class="nav-btn-editor"><span>>_</span> Aprender</a>
+      <a href="docs.html">Documentación</a>
+      <a href="descargas.html">Descargas</a>
+      <a href="https://github.com/vyordan/kem" target="_blank">GitHub</a>
+      <a href="comunidad.html">Comunidad</a>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <img class="hero-background" src="fondo.png" alt="Tejedora tradicional guatemalteca">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Un lenguaje que habla tu idioma</h1>
+      <p class="hero-desc">
+        KEM es un lenguaje de programación con su propio compilador JIT (C++/LLVM) cuyas palabras reservadas se configuran con un simple JSON. Escribe código en español, kaqchikel o cualquier lengua.
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="aprender.html" class="btn-hero">
+          <span>>_</span> Empieza a aprender
+        </a>
+        <a href="https://github.com/vyordan/kem" target="_blank" class="btn-hero" style="background: transparent; border: 1px solid var(--color-accent); color: var(--color-accent); box-shadow: none; padding: 0.9rem 2rem;">
+          Ver en GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BLOQUE DE CÓDIGO DECORATIVO CON PESTAÑAS ===== -->
+  <div class="code-snippet" id="snippet-block">
+    <div class="tabs" style="margin-bottom: 1rem;">
+      <button class="tab-btn active" onclick="switchSnippetLang('es')">Español</button>
+      <button class="tab-btn" onclick="switchSnippetLang('ki')">K'iche'</button>
+      <button class="tab-btn" onclick="switchSnippetLang('en')">English</button>
+    </div>
+    <pre><code id="snippet-code">// Cargando...</code></pre>
+    <span class="lang-indicator" id="snippet-lang-indicator" style="position: static; display: block; text-align: right; margin-top: 0.5rem;">langs/espanol.json</span>
+  </div>
+
+  <!-- ===== SECCIÓN: ¿POR QUÉ KEM? ===== -->
+  <section class="why-kem" style="max-width: 800px; margin: 4rem auto; text-align: center;">
+    <h2 style="font-size: 2rem; color: #fff; margin-bottom: 1.5rem;">¿Por qué <span style="color: var(--color-accent);">Kem</span>?</h2>
+
+    <p style="color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.5rem;">
+      En k'iche', <strong style="color: var(--color-accent);">Kem</strong> significa <strong style="color: #fff;">"tejer"</strong>. 
+      <br><br>Diseñamos este lenguaje bajo la premisa de que programar es, en esencia, el arte de tejer ideas, lógica y algoritmos. Así como los artesanos crean patrones complejos hilo por hilo en un telar, un programador entrelaza líneas de código para construir soluciones. KEM rinde homenaje a esta lógica milenaria.
+    </p>
+
+    <p style="color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.5rem;">
+      Queremos que el <strong style="color: #fff;">desarrollo de software sea realmente accesible</strong>. 
+      Que cualquier persona, sin importar su lengua o su contexto, pueda construir soluciones. 
+      Por eso diseñamos KEM desde cero para que aprender a programar se sienta natural, sin la barrera del inglés.
+    </p>
+
+    <p style="color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.7; margin-bottom: 2rem;">
+      Y no, un lenguaje que se lee como pseudocódigo <strong style="color: var(--color-accent);">no tiene por qué ser lento</strong>. 
+      Gracias a su compilador JIT basado en LLVM, KEM ejecuta código a una buena velocidad.
+    </p>
+  </section>
+
+  <!-- ===== SECCIÓN: FILOSOFÍA (tres aspectos) ===== -->
+  <section class="filosofia-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin: 4rem 0;">
+    <div class="filosofia-item" style="background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: 1.5rem; padding: 2rem; text-align: center;">
+      <h3 style="color: #fff; margin-bottom: 0.8rem;">Lógica sin barreras</h3>
+      <p style="color: var(--color-text-secondary); font-size: 0.95rem;">KEM elimina la fricción del inglés para que hispanohablantes y hablantes de lenguas mayas puedan concentrarse en lo esencial: aprender a pensar de manera lógica.</p>
+    </div>
+    <div class="filosofia-item" style="background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: 1.5rem; padding: 2rem; text-align: center;">
+      <h3 style="color: #fff; margin-bottom: 0.8rem;">Construir cosas reales</h3>
+      <p style="color: var(--color-text-secondary); font-size: 0.95rem;">Con el compilador JIT puedes escribir algoritmos, estructuras de datos, y ejecutarlos con un excelente rendimiento.</p>
+    </div>
+    <div class="filosofia-item" style="background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: 1.5rem; padding: 2rem; text-align: center;">
+      <h3 style="color: #fff; margin-bottom: 0.8rem;">Un lenguaje, muchas voces</h3>
+      <p style="color: var(--color-text-secondary); font-size: 0.95rem;">El sistema de configuración por JSON permite que la misma sintaxis funcione en español, kaqchikel, k'iche' o cualquier lengua. Solo cambia un archivo.</p>
+    </div>
+  </section>
+
+  <!-- ===== LLAMADA A LA ACCIÓN FINAL ===== -->
+  <section style="text-align: center; margin: 4rem 0;">
+    <h2 style="font-size: 2rem; color: #fff; margin-bottom: 1rem;">Empieza a tejer tu propio código</h2>
+    <p style="color: var(--color-text-secondary); margin-bottom: 2rem;">KEM es open source. El compilador está en desarrollo activo. ¿Quieres probarlo, contribuir o dar una clase con él?</p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="aprender.html" class="btn-hero" style="background: var(--color-accent); color: var(--color-bg-deep); padding: 0.8rem 2rem; border-radius: 60px; text-decoration: none; font-weight: 600;">Ver lecciones</a>
+      <a href="https://github.com/vyordan/kem" target="_blank" class="btn-hero" style="background: transparent; border: 1px solid var(--color-accent); color: var(--color-accent); padding: 0.8rem 2rem; border-radius: 60px; text-decoration: none; font-weight: 600;">Ver en GitHub</a>
+    </div>
+  </section>
+
+    <!-- ===== LO QUE VIENE: FUTURO DE KEM ===== -->
+  <section style="margin: 4rem 0 2rem; padding-top: 2rem; border-top: 1px solid var(--color-border);">
+    <h2 style="font-size: 2rem; color: #fff; text-align: center; margin-bottom: 0.5rem;">Lo que viene para KEM</h2>
+    <p style="color: var(--color-text-secondary); text-align: center; max-width: 700px; margin: 0 auto 2.5rem; font-size: 1.05rem;">
+      Estamos trabajando en tres frentes para hacer de KEM una herramienta aún más poderosa y accesible.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+
+      <!-- Tarjeta 1: Completar funcionalidades -->
+      <div style="background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: 1.5rem; padding: 1.8rem; transition: all var(--transition-smooth);">
+        <div style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--color-accent);">1</div>
+        <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 0.8rem;">Completar el lenguaje</h3>
+        <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6;">
+          Implementaremos todas las características que aún faltan según la
+          <a href="docs.html#que-no" style="color: var(--color-accent);">documentación</a>:
+          <code>break</code>, <code>continue</code>, arreglos multidimensionales,
+          conversión explícita de tipos, módulos (<code>importar</code>),
+          funciones variádicas y mucho más. El objetivo es que KEM sea un lenguaje
+          completo y listo para proyectos reales.
+        </p>
+      </div>
+
+      <!-- Tarjeta 2: GUI ligera -->
+      <div style="background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: 1.5rem; padding: 1.8rem; transition: all var(--transition-smooth);">
+        <div style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--color-accent);">2</div>
+        <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 0.8rem;">Interfaz gráfica ligera</h3>
+        <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6;">
+          Un editor de código nativo, rápido y liviano, que permita:
+        </p>
+        <ul style="color: var(--color-text-secondary); font-size: 0.9rem; padding-left: 1.2rem; margin: 0.5rem 0;">
+          <li>Escribir código sin necesidad de guardar en disco (todo en RAM).</li>
+          <li>Ejecutar con un botón, pasando el código directamente al compilador.</li>
+          <li>Cargar archivos JSON para cambiar el idioma del lenguaje de forma interactiva.</li>
+          <li>Resaltado de sintaxis y detección de errores en tiempo real.</li>
+        </ul>
+        <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+          <span style="color: var(--color-accent);">Tecnologías posibles:</span>
+          Dear ImGui + OpenGL (muy ligera), Qt (más completa), o Tkinter + pybind11 (si exponemos KEM como librería).
+        </p>
+      </div>
+
+      <!-- Tarjeta 3: Versión web -->
+      <div style="background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: 1.5rem; padding: 1.8rem; transition: all var(--transition-smooth);">
+        <div style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--color-accent);">3</div>
+        <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 0.8rem;">Compilador en la web</h3>
+        <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6;">
+          Queremos que puedas programar en KEM directamente desde tu navegador,
+          sin instalar nada. La idea es compilar el código en el servidor o,
+          a futuro, usando WebAssembly para ejecutar el compilador en el cliente.
+          <br><br>
+          Esto abrirá KEM a cualquier persona con acceso a Internet, facilitando
+          el aprendizaje y la experimentación.
+        </p>
+      </div>
+
+    </div>
+
+    <p style="color: var(--color-text-muted); text-align: center; margin-top: 2.5rem; font-size: 0.9rem;">
+      Estos son nuestros próximos pasos. Si quieres colaborar o tienes sugerencias,
+      abre un <a href="https://github.com/vyordan/kem/issues" target="_blank" style="color: var(--color-accent);">issue</a> o participa en
+      <a href="https://github.com/vyordan/kem/discussions" target="_blank" style="color: var(--color-accent);">Discussions</a>.
+    </p>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <p><code>Kem-lang</code> · Compilador JIT en C++ con LLVM · open source</p>
+    <p>
+      <a href="https://github.com/vyordan/kem" target="_blank">GitHub</a> · 
+      <a href="docs.html">Documentación</a>
+    </p>
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
