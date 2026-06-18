@@ -73,7 +73,8 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/integration)
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
 add_subdirectory(cli)
-
+# ── GUI ───────────────────────────────────────────────────────────────────────
+add_subdirectory(gui)
 # ── libkem ────────────────────────────────────────────────────────────────────
 add_library(libkem STATIC
     src/Token.cpp
