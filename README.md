@@ -1,8 +1,7 @@
 [![Docker Image Size](https://img.shields.io/docker/image-size/vyordan/kem?label=Tama%C3%B1o%20de%20la%20imagen)](https://hub.docker.com/r/vyordan/kem)
-[![Docker Pulls](https://img.shields.io/docker/pulls/vyordan/kem?label=Descargas)](https://hub.docker.com/r/vyordan/kem)
 
 <div align="center">
-  <img src="doc/xd (1).png" alt="KEM logo extendido" width="250"/>
+  <img src="doc/logoExtendido.png" alt="KEM logo extendido" width="250"/>
   
   **Un Lenguaje que habla tu Idioma**
 </div>
@@ -86,7 +85,7 @@ docker run --rm -v $(pwd)/mi_programa.kem:/programa.kem kem --emit-ir /programa.
 
 ## Editor gráfico KEM (GUI)
 
-![captura gui - ejecucion programa](doc/ide.png)
+[captura gui - ejecucion programa](doc/ide.png)
 
 La carpeta `gui/` contiene un editor de código integrado para programas KEM, construido con GLFW, ImGui (rama docking) y OpenGL.
 
