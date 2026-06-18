@@ -86,7 +86,7 @@ docker run --rm -v $(pwd)/mi_programa.kem:/programa.kem kem --emit-ir /programa.
 
 ## Editor gráfico KEM (GUI)
 
-![captura gui - ejecucion programa](doc/gui.png)
+![captura gui - ejecucion programa](doc/ide.png)
 
 La carpeta `gui/` contiene un editor de código integrado para programas KEM, construido con GLFW, ImGui (rama docking) y OpenGL.
 
