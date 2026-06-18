@@ -45,7 +45,7 @@ cmake --build build
 ```
 
 
-## Uso
+## Uso por terminal (CLI)
 
 ```bash
 # Ejecutar un programa KEM
@@ -84,6 +84,24 @@ docker run --rm -v $(pwd)/mi_programa.kem:/programa.kem kem --emit-ir /programa.
 
 ---
 
+## Editor gráfico KEM (GUI)
+
+![captura gui - ejecucion programa](doc/gui.png)
+
+La carpeta `gui/` contiene un editor de código integrado para programas KEM, construido con GLFW, ImGui (rama docking) y OpenGL.
+
+NOTA: Por el momento tiene lo basico para funcionar, se espera primerto terminar de refinar el compilador para luego proceder con el desarrollo del IDE.
+
+**Características principales:**
+- Ejecución del pipeline KEM directamente desde la GUI, sin guardar en disco.
+- Captura opcional de la salida en un panel interno o visualización en la terminal original.
+- Opción de lanzar el programa en una terminal externa para interacción completa (stdin/stdout).
+- Paneles redimensionables y reorganizables mediante docking.
+
+**Ejecución:**
+```bash
+./build/gui/kem_gui
+```
 
 ## Ejemplo de programa KEM
 
