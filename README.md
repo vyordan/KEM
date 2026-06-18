@@ -45,7 +45,7 @@ cmake --build build
 ```
 
 
-## Uso
+## Uso por terminal (CLI)
 
 ```bash
 # Ejecutar un programa KEM
