@@ -1,4 +1,5 @@
 [![Docker Image Size](https://img.shields.io/docker/image-size/vyordan/kem?label=Tama%C3%B1o%20de%20la%20imagen)](https://hub.docker.com/r/vyordan/kem)
+![Status](https://img.shields.io/badge/status-alpha-orange)
 
 <div align="center">
   <img src="doc/logoExtendido.png" alt="KEM logo extendido" width="250"/>
