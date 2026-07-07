@@ -14,7 +14,7 @@
 El proyecto es un ecosistema integrado que unifica un lenguaje accesible con una infraestructura de bajo nivel basada en **LLVM**, utiliza **C++** para el pasar del Codigo fuente (codigo KEM) a LLVM IR.
 
 * **Compilación JIT Nativa:** Toma el código fuente y lo compila directamente a código de máquina al vuelo vía LLVM, garantizando una ejecución rápida.
-* **Modularidad Lingüística Absoluta:** Aunque la sintaxis por defecto es en español, el idioma de las palabras clave es 100% configurable mediante un archivo JSON externo. Esto permite reutilizar el mismo compilador para mapear el lenguaje a cualquier idioma natural o variante maya (como el Kaqchikel o K'iche').
+* **Modularidad Lingüística Absoluta:** Aunque la sintaxis por defecto es en español, el idioma de las palabras clave y los mensajes de error son 100% configurables mediante un archivo JSON externo. Esto permite reutilizar el mismo compilador para mapear el lenguaje a cualquier idioma natural o variante maya (como el Kaqchikel o K'iche').
 
 ---
 [Documentacion](doc/kem_documentacion.md) - En la carpeta doc se encuentra documentacion mas detallada y completa, este README es una presentacion rapida de lo que es el proyecto. 
