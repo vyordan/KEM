@@ -27,16 +27,23 @@ namespace kem {
 // ─────────────────────────────────────────────
 class Lexer {
 public:
-    // src:    contenido completo del archivo .kem
-    // config: instancia ya cargada de LangConfig
-    Lexer(const std::string& src, const LangConfig& config);
+    // src:    contenido completo del archivo .kem (se copia internamente)
+    // config: instancia ya cargada de LangConfig (vive más que el Lexer
+    //         en el flujo normal del CLI, por eso sí se referencia)
+    explicit Lexer(std::string src, const LangConfig& config);
 
     // Tokeniza todo el fuente de una vez.
     // Lanza KemError(Phase::LEXER, ...) ante cualquier carácter inválido.
     std::vector<Token> tokenize();
 
 private:
-    const std::string&  src_;
+    // NOTA: src_ se guarda como COPIA (no referencia) a propósito.
+    // Si fuera `const std::string&`, pasar un literal de C-string como
+    // `Lexer(\"texto\", cfg)` crea un std::string temporal que se destruye
+    // al final de la expresión, dejando una referencia colgante (dangling
+    // reference) — el Lexer leería memoria liberada y produciría bytes
+    // basura. Copiar el string evita esta clase de bug por completo.
+    std::string         src_;
     const LangConfig&   config_;
 
     int pos_  = 0;   // posición actual en src_

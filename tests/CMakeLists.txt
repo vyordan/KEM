@@ -13,6 +13,7 @@
 add_library(libkem_base STATIC
     ${CMAKE_SOURCE_DIR}/src/Token.cpp
     ${CMAKE_SOURCE_DIR}/src/ErrorHandler.cpp
+    ${CMAKE_SOURCE_DIR}/src/ErrorMessages.cpp
     ${CMAKE_SOURCE_DIR}/src/LangConfig.cpp
     ${CMAKE_SOURCE_DIR}/src/Lexer.cpp
     ${CMAKE_SOURCE_DIR}/src/AST.cpp
@@ -49,6 +50,16 @@ add_test(
     NAME    semantic
     COMMAND $<TARGET_FILE:kem_test_semantic>
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/semantic
+)
+
+# ── ErrorMessages (mensajes localizables) ─────────────────────────────────────
+add_executable(kem_test_errors errors/test_error_messages.cpp)
+target_link_libraries(kem_test_errors PRIVATE libkem_base)
+add_dependencies(kem_test_errors copy_langs)
+add_test(
+    NAME    error_messages
+    COMMAND $<TARGET_FILE:kem_test_errors>
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/errors
 )
 
 # ── Codegen + JIT (requiere LLVM) ─────────────────────────────────────────────

@@ -1,4 +1,5 @@
 #include "kem/SemanticAnalyzer.hpp"
+#include "kem/ErrorMessages.hpp"
 #include <sstream>
 #include <iostream>
 
@@ -23,7 +24,7 @@ Symbol* Scope::lookupLocal(const std::string& name) {
 void Scope::declare(Symbol sym, int line, int col) {
     if (lookupLocal(sym.name)) {
         throw KemError(Phase::SEMANTIC,
-            "'" + sym.name + "' ya fue declarado en este scope", line, col);
+            errorMessages().format("SEM_VAR_DUPLICADA", {sym.name}), line, col);
     }
     symbols[sym.name] = std::move(sym);
 }
@@ -81,18 +82,18 @@ TypeKind SemanticAnalyzer::binaryResultType(const std::string& op,
                                               int line, int col) {
     if (op == "y" || op == "o") {
         if (left != TypeKind::BOOLEANO || right != TypeKind::BOOLEANO)
-            error("Los operadores 'y' y 'o' requieren operandos booleanos", line, col);
+            error(errorMessages().format("SEM_OPERADOR_BOOLEANO"), line, col);
         return TypeKind::BOOLEANO;
     }
     if (op == "==" || op == "!=" || op == "<" || op == ">" ||
         op == "<=" || op == ">=") {
         if (!typesCompatible(left, right))
-            error("No se pueden comparar tipos incompatibles con '" + op + "'", line, col);
+            error(errorMessages().format("SEM_COMPARACION_INCOMPATIBLE", {op}), line, col);
         return TypeKind::BOOLEANO;
     }
     if (op == "+" || op == "-" || op == "*" || op == "/" || op == "%") {
         if (!isNumeric(left) || !isNumeric(right)) {
-            error("El operador '" + op + "' requiere operandos numéricos", line, col);
+            error(errorMessages().format("SEM_OPERADOR_NUMERICO", {op}), line, col);
             return TypeKind::UNKNOWN;
         }
         if (left == TypeKind::DECIMAL || right == TypeKind::DECIMAL)
@@ -108,9 +109,9 @@ TypeKind SemanticAnalyzer::binaryResultType(const std::string& op,
 void SemanticAnalyzer::analyze(Program& prog) {
     prog.accept(*this);
     if (errors_ > 0) {
-        std::ostringstream ss;
-        ss << "El programa tiene " << errors_ << " error(es) semántico(s).";
-        throw KemError(Phase::SEMANTIC, ss.str());
+        throw KemError(Phase::SEMANTIC,
+            errorMessages().format("SEM_ERRORES_ACUMULADOS",
+                {std::to_string(errors_)}));
     }
 }
 
@@ -190,7 +191,7 @@ void SemanticAnalyzer::visit(FuncDef& fn) {
     fn.body->accept(*this);
 
     if (!found_return_)
-        error("La función '" + fn.name + "' no siempre retorna un valor", fn.line, fn.col);
+        error(errorMessages().format("SEM_FUNCION_NO_RETORNA", {fn.name}), fn.line, fn.col);
 
     in_function_ = prev_in; current_return_type_ = prev_ret;
     found_return_ = prev_found; current_func_name_ = prev_name;
@@ -226,7 +227,7 @@ void SemanticAnalyzer::visit(StructDef& st) {
     std::unordered_map<std::string, bool> seen;
     for (auto& f : st.fields) {
         if (seen.count(f.name))
-            error("Campo duplicado '" + f.name + "' en estructura '" + st.name + "'",
+            error(errorMessages().format("SEM_CAMPO_DUPLICADO", {f.name, st.name}),
                   f.line, f.col);
         seen[f.name] = true;
     }
@@ -255,9 +256,9 @@ void SemanticAnalyzer::visit(VarDecl& decl) {
         if (last_type_.kind != TypeKind::UNKNOWN &&
             decl.type.kind != TypeKind::UNKNOWN &&
             !typesCompatible(decl.type.kind, last_type_.kind)) {
-            error("No se puede inicializar '" + decl.name + "' (" +
-                  decl.type.toString() + ") con valor de tipo '" +
-                  TypeAnnotation{last_type_.kind,false,0}.toString() + "'",
+            error(errorMessages().format("SEM_TIPO_INCOMPATIBLE_INIT",
+                  {decl.name, decl.type.toString(),
+                   TypeAnnotation{last_type_.kind,false,0}.toString()}),
                   decl.line, decl.col);
         }
     }
@@ -273,18 +274,18 @@ void SemanticAnalyzer::visit(VarDecl& decl) {
 // ─────────────────────────────────────────────
 void SemanticAnalyzer::visit(ArrayDecl& decl) {
     if (decl.type.array_size <= 0)
-        error("El tamaño del arreglo '" + decl.name + "' debe ser mayor que cero",
+        error(errorMessages().format("SEM_ARREGLO_TAMANO_INVALIDO", {decl.name}),
               decl.line, decl.col);
 
     if (!decl.init.empty()) {
         if ((int)decl.init.size() > decl.type.array_size)
-            error("Inicializador de '" + decl.name + "' tiene más elementos que el tamaño declarado",
+            error(errorMessages().format("SEM_ARREGLO_INIT_EXCEDE", {decl.name}),
                   decl.line, decl.col);
         for (auto& elem : decl.init) {
             elem->accept(*this);
             if (last_type_.kind != TypeKind::UNKNOWN &&
                 !typesCompatible(decl.type.kind, last_type_.kind))
-                error("Tipo incompatible en inicializador de '" + decl.name + "'",
+                error(errorMessages().format("SEM_ARREGLO_INIT_TIPO", {decl.name}),
                       decl.line, decl.col);
         }
     }
@@ -306,9 +307,9 @@ void SemanticAnalyzer::visit(AssignStmt& stmt) {
 
     if (tgt_type != TypeKind::UNKNOWN && val_type != TypeKind::UNKNOWN &&
         !typesCompatible(tgt_type, val_type)) {
-        error("No se puede asignar '" +
-              TypeAnnotation{val_type,false,0}.toString() + "' a '" +
-              TypeAnnotation{tgt_type,false,0}.toString() + "'",
+        error(errorMessages().format("SEM_TIPO_INCOMPATIBLE_ASIGN",
+              {TypeAnnotation{val_type,false,0}.toString(),
+               TypeAnnotation{tgt_type,false,0}.toString()}),
               stmt.line, stmt.col);
     }
 }
@@ -319,7 +320,7 @@ void SemanticAnalyzer::visit(AssignStmt& stmt) {
 void SemanticAnalyzer::visit(IfStmt& stmt) {
     stmt.condition->accept(*this);
     if (last_type_.kind != TypeKind::BOOLEANO && last_type_.kind != TypeKind::UNKNOWN)
-        error("La condición del 'si' debe ser booleana", stmt.line, stmt.col);
+        error(errorMessages().format("SEM_SI_CONDICION_BOOLEANA"), stmt.line, stmt.col);
     stmt.then_block->accept(*this);
     if (stmt.else_block) stmt.else_block->accept(*this);
 }
@@ -327,17 +328,17 @@ void SemanticAnalyzer::visit(IfStmt& stmt) {
 void SemanticAnalyzer::visit(WhileStmt& stmt) {
     stmt.condition->accept(*this);
     if (last_type_.kind != TypeKind::BOOLEANO && last_type_.kind != TypeKind::UNKNOWN)
-        error("La condición del 'mientras' debe ser booleana", stmt.line, stmt.col);
+        error(errorMessages().format("SEM_MIENTRAS_CONDICION_BOOLEANA"), stmt.line, stmt.col);
     stmt.body->accept(*this);
 }
 
 void SemanticAnalyzer::visit(ForStmt& stmt) {
     Symbol* sym = current_scope_->lookup(stmt.iter_var);
     if (!sym)
-        error("Variable de iteración '" + stmt.iter_var + "' no declarada",
+        error(errorMessages().format("SEM_ITER_VAR_NO_DECLARADA", {stmt.iter_var}),
               stmt.line, stmt.col);
     else if (sym->type.kind != TypeKind::ENTERO)
-        error("La variable de iteración '" + stmt.iter_var + "' debe ser entero",
+        error(errorMessages().format("SEM_ITER_VAR_NO_ENTERO", {stmt.iter_var}),
               stmt.line, stmt.col);
 
     stmt.start->accept(*this);
@@ -349,16 +350,16 @@ void SemanticAnalyzer::visit(ForStmt& stmt) {
 void SemanticAnalyzer::visit(ReturnStmt& stmt) {
     if (stmt.value) {
         if (!in_function_) {
-            error("Un procedimiento no puede retornar un valor", stmt.line, stmt.col);
+            error(errorMessages().format("SEM_PROC_NO_RETORNA_VALOR"), stmt.line, stmt.col);
             return;
         }
         stmt.value->accept(*this);
         if (last_type_.kind != TypeKind::UNKNOWN &&
             !typesCompatible(current_return_type_, last_type_.kind)) {
-            error("La función '" + current_func_name_ + "' debe retornar '" +
-                  TypeAnnotation{current_return_type_,false,0}.toString() +
-                  "' pero se encontró '" +
-                  TypeAnnotation{last_type_.kind,false,0}.toString() + "'",
+            error(errorMessages().format("SEM_RETORNO_TIPO_INCORRECTO",
+                  {current_func_name_,
+                   TypeAnnotation{current_return_type_,false,0}.toString(),
+                   TypeAnnotation{last_type_.kind,false,0}.toString()}),
                   stmt.line, stmt.col);
         }
         found_return_ = true;
@@ -376,7 +377,7 @@ void SemanticAnalyzer::visit(BoolLiteral&)    { last_type_ = {TypeKind::BOOLEANO
 void SemanticAnalyzer::visit(IdentExpr& expr) {
     Symbol* sym = current_scope_->lookup(expr.name);
     if (!sym) {
-        error("Variable '" + expr.name + "' no declarada", expr.line, expr.col);
+        error(errorMessages().format("SEM_VAR_NO_DECLARADA", {expr.name}), expr.line, expr.col);
         last_type_ = {TypeKind::UNKNOWN, false, 0};
         return;
     }
@@ -393,11 +394,11 @@ void SemanticAnalyzer::visit(UnaryExpr& expr) {
     expr.operand->accept(*this);
     if (expr.op == "no") {
         if (last_type_.kind != TypeKind::BOOLEANO && last_type_.kind != TypeKind::UNKNOWN)
-            error("'no' requiere operando booleano", expr.line, expr.col);
+            error(errorMessages().format("SEM_NOT_REQUIERE_BOOLEANO"), expr.line, expr.col);
         last_type_ = {TypeKind::BOOLEANO, false, 0};
     } else if (expr.op == "-") {
         if (!isNumeric(last_type_.kind) && last_type_.kind != TypeKind::UNKNOWN)
-            error("'-' unario requiere operando numérico", expr.line, expr.col);
+            error(errorMessages().format("SEM_NEG_REQUIERE_NUMERICO"), expr.line, expr.col);
     }
 }
 
@@ -461,7 +462,7 @@ void SemanticAnalyzer::visit(CallExpr& expr) {
     if (isBuiltin(expr.callee)) {
         auto [ok, ret_type] = checkBuiltin(expr.callee, expr.args);
         if (!ok) {
-            error("Llamada incorrecta al builtin '" + expr.callee + "'",
+            error(errorMessages().format("SEM_BUILTIN_LLAMADA_INVALIDA", {expr.callee}),
                   expr.line, expr.col);
             last_type_ = {TypeKind::UNKNOWN, false, 0};
             return;
@@ -471,13 +472,13 @@ void SemanticAnalyzer::visit(CallExpr& expr) {
             expr.args[0]->accept(*this);
             if (last_type_.kind != TypeKind::ENTERO &&
                 last_type_.kind != TypeKind::UNKNOWN)
-                error("imprimirEntero espera un 'entero'", expr.line, expr.col);
+                error(errorMessages().format("SEM_BUILTIN_ESPERA_ENTERO"), expr.line, expr.col);
         } else if (expr.callee == "imprimirDecimal" && !expr.args.empty()) {
             expr.args[0]->accept(*this);
             if (last_type_.kind != TypeKind::DECIMAL &&
                 last_type_.kind != TypeKind::UNKNOWN &&
                 !isNumeric(last_type_.kind))
-                error("imprimirDecimal espera un 'decimal'", expr.line, expr.col);
+                error(errorMessages().format("SEM_BUILTIN_ESPERA_DECIMAL"), expr.line, expr.col);
         } else {
             // imprimir / imprimirLinea: visitar el arg para detectar errores
             for (auto& a : expr.args) a->accept(*this);
@@ -489,18 +490,21 @@ void SemanticAnalyzer::visit(CallExpr& expr) {
     // ── Funciones definidas por el usuario ────────────────────────────────────
     Symbol* sym = current_scope_->lookup(expr.callee);
     if (!sym) {
-        error("'" + expr.callee + "' no está declarado", expr.line, expr.col);
+        error(errorMessages().format("SEM_FUNCION_NO_DECLARADA", {expr.callee}),
+              expr.line, expr.col);
         last_type_ = {TypeKind::UNKNOWN, false, 0};
         return;
     }
     if (sym->kind != Symbol::Kind::FUNCTION && sym->kind != Symbol::Kind::PROCEDURE) {
-        error("'" + expr.callee + "' no es una función ni procedimiento", expr.line, expr.col);
+        error(errorMessages().format("SEM_NO_ES_FUNCION", {expr.callee}),
+              expr.line, expr.col);
         last_type_ = {TypeKind::UNKNOWN, false, 0};
         return;
     }
     if (expr.args.size() != sym->params.size())
-        error("'" + expr.callee + "' espera " + std::to_string(sym->params.size()) +
-              " argumento(s), recibió " + std::to_string(expr.args.size()),
+        error(errorMessages().format("SEM_ARGS_CANTIDAD",
+              {expr.callee, std::to_string(sym->params.size()),
+               std::to_string(expr.args.size())}),
               expr.line, expr.col);
 
     size_t n = std::min(expr.args.size(), sym->params.size());
@@ -510,9 +514,10 @@ void SemanticAnalyzer::visit(CallExpr& expr) {
         TypeKind par = sym->params[i].type.kind;
         if (arg != TypeKind::UNKNOWN && par != TypeKind::UNKNOWN &&
             !typesCompatible(par, arg))
-            error("Argumento " + std::to_string(i+1) + " de '" + expr.callee +
-                  "': se esperaba '" + TypeAnnotation{par,false,0}.toString() +
-                  "' pero se pasó '" + TypeAnnotation{arg,false,0}.toString() + "'",
+            error(errorMessages().format("SEM_ARGS_TIPO",
+                  {std::to_string(i+1), expr.callee,
+                   TypeAnnotation{par,false,0}.toString(),
+                   TypeAnnotation{arg,false,0}.toString()}),
                   expr.line, expr.col);
     }
     last_type_ = sym->return_type;
@@ -522,10 +527,10 @@ void SemanticAnalyzer::visit(IndexExpr& expr) {
     expr.object->accept(*this);
     TypeAnnotation obj = last_type_;
     if (!obj.is_array && obj.kind != TypeKind::UNKNOWN)
-        error("Solo se puede indexar con '[]' sobre un arreglo", expr.line, expr.col);
+        error(errorMessages().format("SEM_INDEXAR_NO_ARREGLO"), expr.line, expr.col);
     expr.index->accept(*this);
     if (last_type_.kind != TypeKind::ENTERO && last_type_.kind != TypeKind::UNKNOWN)
-        error("El índice debe ser de tipo entero", expr.line, expr.col);
+        error(errorMessages().format("SEM_INDICE_NO_ENTERO"), expr.line, expr.col);
     last_type_ = {obj.kind, false, 0};
 }
 
@@ -533,7 +538,7 @@ void SemanticAnalyzer::visit(MemberExpr& expr) {
     expr.object->accept(*this);
     // Si el tipo es primitivo, el acceso con '.' es inválido
     if (last_type_.kind != TypeKind::UNKNOWN)
-        error("El operador '.' solo aplica sobre estructuras", expr.line, expr.col);
+        error(errorMessages().format("SEM_PUNTO_SOLO_ESTRUCTURAS"), expr.line, expr.col);
     // Para tipos de usuario (structs) el Codegen verifica el campo directamente
     last_type_ = {TypeKind::UNKNOWN, false, 0};
 }
