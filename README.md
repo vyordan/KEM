@@ -19,7 +19,6 @@ El proyecto es un ecosistema integrado que unifica un lenguaje accesible con una
 ---
 [Documentacion](doc/kem_documentacion.md) - En la carpeta doc se encuentra documentacion mas detallada y completa, este README es una presentacion rapida de lo que es el proyecto. 
 ---
-
 ## Requisitos
 
 ```bash
@@ -34,7 +33,7 @@ Versión mínima de LLVM: **17**. Probado con LLVM 22.
 ## Compilar
 
 ```bash
-git clone https://github.com/vyordan/kem
+git clone https://github.com/tu-usuario/kem
 cd kem
 
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
@@ -44,8 +43,9 @@ cmake --build build
 ./build/cli/kem --help
 ```
 
+---
 
-## Uso por terminal (CLI)
+## Uso
 
 ```bash
 # Ejecutar un programa KEM
@@ -68,40 +68,6 @@ cmake --build build
 ```
 
 ---
-
-## Docker
-
-```bash
-# Construir la imagen
-docker build -t kem .
-
-# Ejecutar un programa
-docker run --rm -v $(pwd)/mi_programa.kem:/programa.kem kem /programa.kem
-
-# Ver el IR generado
-docker run --rm -v $(pwd)/mi_programa.kem:/programa.kem kem --emit-ir /programa.kem
-```
-
----
-
-## Editor gráfico KEM (GUI)
-
-[captura gui - ejecucion programa](doc/ide.png)
-
-La carpeta `gui/` contiene un editor de código integrado para programas KEM, construido con GLFW, ImGui (rama docking) y OpenGL.
-
-NOTA: Por el momento tiene lo basico para funcionar, se espera primerto terminar de refinar el compilador para luego proceder con el desarrollo del IDE.
-
-**Características principales:**
-- Ejecución del pipeline KEM directamente desde la GUI, sin guardar en disco.
-- Captura opcional de la salida en un panel interno o visualización en la terminal original.
-- Opción de lanzar el programa en una terminal externa para interacción completa (stdin/stdout).
-- Paneles redimensionables y reorganizables mediante docking.
-
-**Ejecución:**
-```bash
-./build/gui/kem_gui
-```
 
 ## Ejemplo de programa KEM
 
@@ -148,6 +114,18 @@ El mismo programa escrito en inglés:
 ```bash
 ./kem --lang=langs/english.json programa.kem
 ```
+
+Los mensajes de error también son traducibles, vía `langs/errors/`:
+
+```
+langs/errors/espanol.json   # "Variable '{0}' no declarada"
+langs/errors/english.json   # "Variable '{0}' is not declared"
+```
+
+La ruta se deriva automáticamente de `--lang` — no hace falta un flag
+separado. Si un idioma no tiene archivo de errores, el compilador no
+falla: muestra el código interno entre corchetes en vez del texto
+traducido. Ver `kem_documentacion.md` sección 13 para el detalle completo.
 
 ---
 
@@ -221,64 +199,6 @@ p.x = 1.0
 p.y = 2.0
 ```
 
-### Salida
-
-```
-imprimir(texto)          // imprime el texto sin salto de linea al final
-imprimirLinea(texto)     // imprime el texto con salto de linea al final
-imprimirEntero(entero)   // imprime un entero en formato decimal
-imprimirDecimal(decimal) // imprime un decimal con 6 cifras decimales
-```
-
-**Ejemplos:**
-
-```
-inicio {
-    imprimir("Hola, ")
-    imprimirLinea("mundo!")          // salida: Hola, mundo!
-
-    imprimirEntero(42)               // salida: 42
-    imprimirEntero(-7)               // salida: -7
-
-    imprimirDecimal(3.14159)         // salida: 3.141590
-    imprimirDecimal(2.0)             // salida: 2.000000
-
-    imprimir("resultado = ")
-    imprimirEntero(3 + 4 * 2)        // salida: resultado = 11
-}
-```
-
-Se pueden combinar para formatear salida compleja
-
-### Entrada
-
-```
-leerLinea()   → texto    // lee una linea completa de stdin
-leerEntero()  → entero   // lee un numero entero de stdin
-leerDecimal() → decimal  // lee un numero decimal de stdin
-```
-
-**Ejemplos:**
-
-```
-inicio {
-    imprimir("Ingresa tu nombre: ")
-    texto nombre = leerLinea()
-    imprimir("Hola, ")
-    imprimirLinea(nombre)
-
-    imprimir("Ingresa un numero: ")
-    entero n = leerEntero()
-    imprimir("El doble es: ")
-    imprimirEntero(n * 2)
-    imprimirLinea("")
-
-    imprimir("Ingresa un decimal: ")
-    decimal d = leerDecimal()
-    imprimirDecimal(d * d)
-}
-```
-
 ### Interoperabilidad con C
 
 ```
@@ -319,6 +239,21 @@ ctest --output-on-failure
 
 ---
 
+## Docker
+
+```bash
+# Construir la imagen
+docker build -t kem .
+
+# Ejecutar un programa
+docker run --rm -v $(pwd)/mi_programa.kem:/programa.kem kem /programa.kem
+
+# Ver el IR generado
+docker run --rm -v $(pwd)/mi_programa.kem:/programa.kem kem --emit-ir /programa.kem
+```
+
+---
+
 ## Arquitectura del compilador
 
 ```
@@ -345,73 +280,6 @@ ORC JIT ─────────── código nativo x86-64
     ▼
 Ejecución
 ```
-## Árbol completo
-
-```
-kem/
-├── CMakeLists.txt                  ← build raíz, ensambla todos los sub-targets
-├── README.md
-├── Dockerfile
-├── .gitignore
-│
-├── include/
-│   └── kem/
-│       ├── LangConfig.hpp          ← carga el JSON de idioma, resuelve keywords → TokenType
-│       ├── Token.hpp               ← struct Token + enum TokenType (sin lógica, solo datos)
-│       ├── Lexer.hpp               ← tokenizador
-│       ├── AST.hpp                 ← todos los nodos del AST + interfaz Visitor
-│       ├── Parser.hpp              ← recursive descent + Pratt
-│       ├── SemanticAnalyzer.hpp    ← Visitor: verifica tipos y scopes
-│       ├── IRGenerator.hpp         ← Visitor: AST → LLVM IR
-│       ├── JITEngine.hpp           ← wrapper del ORC JIT
-│       └── ErrorHandler.hpp        ← errores con línea, columna y mensaje localizable
-│
-├── src/
-│   ├── LangConfig.cpp
-│   ├── Lexer.cpp
-│   ├── AST.cpp                     ← implementación de métodos de los nodos (si los hay)
-│   ├── Parser.cpp
-│   ├── SemanticAnalyzer.cpp
-│   ├── IRGenerator.cpp
-│   └── JITEngine.cpp
-│   └── ErrorHandler.cpp
-│
-├── cli/
-│   ├── CMakeLists.txt              ← target ejecutable: kem
-│   └── main.cpp                    ← parsea args, carga LangConfig, corre el pipeline
-│
-├── langs/                          ← archivos de idioma intercambiables
-│   ├── espanol.json                ← idioma por defecto
-│   └── english.json                ← demostración del sistema multi-idioma
-│
-├── examples/                       ← programas KEM de ejemplo (también usados en tests)
-│   ├── hola.kem
-│   ├── fibonacci.kem
-│   ├── factorial.kem
-│   ├── arreglos.kem
-│   └── estructuras.kem
-│
-├── tests/
-│   ├── CMakeLists.txt
-│   ├── lexer/
-│   │   ├── test_tokens.cpp         ← tokeniza strings conocidos, verifica output
-│   │   └── test_comentarios.cpp
-│   ├── parser/
-│   │   ├── test_expresiones.cpp
-│   │   ├── test_funciones.cpp
-│   │   └── test_flujo.cpp
-│   ├── semantic/
-│   │   ├── test_tipos.cpp          ← errores semánticos esperados
-│   │   └── test_scopes.cpp
-│   ├── codegen/
-│   │   └── test_ir.cpp             ← verifica que el IR generado sea válido
-│   └── integration/
-│       └── test_ejemplos.cpp       ← compila y ejecuta examples/*.kem, verifica resultado
-
-```
-
----
-
 
 ### Módulos
 

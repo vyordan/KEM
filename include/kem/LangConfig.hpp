@@ -41,9 +41,27 @@ public:
     // Retorna el nombre del idioma declarado en el JSON ("español", "english"…)
     const std::string& langName() const { return lang_name_; }
 
+    // ── Palabras de comentario (configurables por idioma) ──────────
+    // El JSON puede definir las claves especiales "_comment_line" y
+    // "_comment_block" con la palabra nativa de comentario del idioma
+    // (ej: "comentario" en español, "comment" en inglés). Si el idioma
+    // no las define, el estilo de comentario nativo de KEM queda
+    // deshabilitado para ese idioma — solo quedan // y /* */ que son
+    // universales y no dependen de ninguna palabra.
+
+    // Palabra que inicia un comentario de línea estilo KEM. Vacío si no está definida.
+    const std::string& commentLineWord() const { return comment_line_word_; }
+
+    // Palabra que inicia un comentario de bloque estilo KEM (seguida de '{').
+    // Vacío si no está definida.
+    const std::string& commentBlockWord() const { return comment_block_word_; }
+
 private:
     std::string path_;
     std::string lang_name_;
+
+    std::string comment_line_word_;
+    std::string comment_block_word_;
 
     // Mapa: palabra en el idioma → TokenType interno
     // Ejemplo: "funcion" → KW_FUNCION  (espanol.json)

@@ -1,5 +1,6 @@
 #include "kem/LangConfig.hpp"
 #include "kem/ErrorHandler.hpp"
+#include "kem/ErrorMessages.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -55,7 +56,7 @@ TokenType LangConfig::tokenTypeFromString(const std::string& name) {
 
     auto it = table.find(name);
     if (it == table.end()) {
-        configError("TokenType desconocido en archivo de idioma: '" + name + "'");
+        configError(errorMessages().format("CONFIG_TOKENTYPE_DESCONOCIDO", {name}));
     }
     return it->second;
 }
@@ -73,7 +74,7 @@ TokenType LangConfig::tokenTypeFromString(const std::string& name) {
 void LangConfig::loadFromFile(const std::string& json_path) {
     std::ifstream file(json_path);
     if (!file.is_open()) {
-        configError("No se puede abrir el archivo de idioma: '" + json_path + "'");
+        configError(errorMessages().format("CONFIG_ARCHIVO_NO_ENCONTRADO", {json_path}));
     }
 
     std::string content((std::istreambuf_iterator<char>(file)),
@@ -98,29 +99,41 @@ void LangConfig::loadFromFile(const std::string& json_path) {
         if (key_start == std::string::npos) break;
         size_t key_end = content.find('"', key_start + 1);
         if (key_end == std::string::npos) {
-            configError("JSON malformado en '" + json_path + "': cadena sin cerrar");
+            configError(errorMessages().format("CONFIG_JSON_MALFORMADO",
+                {json_path, "cadena sin cerrar"}));
         }
         std::string key = content.substr(key_start + 1, key_end - key_start - 1);
 
         // Saltar el ':'
         size_t colon = content.find(':', key_end + 1);
         if (colon == std::string::npos) {
-            configError("JSON malformado en '" + json_path + "': falta ':' después de '" + key + "'");
+            configError(errorMessages().format("CONFIG_JSON_MALFORMADO",
+                {json_path, "falta ':' después de '" + key + "'"}));
         }
 
         // Buscar el valor (string)
         size_t val_start = content.find('"', colon + 1);
         if (val_start == std::string::npos) {
-            configError("JSON malformado en '" + json_path + "': falta valor para '" + key + "'");
+            configError(errorMessages().format("CONFIG_JSON_MALFORMADO",
+                {json_path, "falta valor para '" + key + "'"}));
         }
         size_t val_end = content.find('"', val_start + 1);
         if (val_end == std::string::npos) {
-            configError("JSON malformado en '" + json_path + "': valor sin cerrar para '" + key + "'");
+            configError(errorMessages().format("CONFIG_JSON_MALFORMADO",
+                {json_path, "valor sin cerrar para '" + key + "'"}));
         }
         std::string value = content.substr(val_start + 1, val_end - val_start - 1);
 
-        // Ignorar claves vacías o que empiecen con '_' (comentarios de convención)
-        if (!key.empty() && key[0] != '_') {
+        // Las claves "_comment_line" y "_comment_block" definen las palabras
+        // nativas de comentario del idioma — no son keywords del lenguaje,
+        // así que se capturan aparte y no pasan por tokenTypeFromString.
+        if (key == "_comment_line") {
+            comment_line_word_ = value;
+        } else if (key == "_comment_block") {
+            comment_block_word_ = value;
+        }
+        // Ignorar otras claves vacías o que empiecen con '_' (metadatos)
+        else if (!key.empty() && key[0] != '_') {
             TokenType type = tokenTypeFromString(value);
             keyword_map_[key] = type;
         }
@@ -154,13 +167,13 @@ void LangConfig::validate() const {
     }
 
     if (!missing.empty()) {
-        std::string msg = "El archivo de idioma '" + path_ +
-                          "' no define las siguientes keywords obligatorias: ";
+        std::string list;
         for (size_t i = 0; i < missing.size(); ++i) {
-            if (i > 0) msg += ", ";
-            msg += missing[i];
+            if (i > 0) list += ", ";
+            list += missing[i];
         }
-        configError(msg);
+        configError(errorMessages().format("CONFIG_KEYWORDS_FALTANTES",
+            {path_, list}));
     }
 }
 

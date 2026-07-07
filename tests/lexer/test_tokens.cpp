@@ -191,6 +191,29 @@ TEST(test_comentario_kem_bloque) {
     ASSERT_EQ((int)tokens.size(), 5);
 }
 
+TEST(test_comentario_no_confunde_identificador_similar) {
+    // "comentarioX" es un identificador válido, no debe disparar el comentario
+    auto tokens = lex("entero comentarioX = 5");
+    ASSERT_EQ((int)tokens.size(), 5); // entero, comentarioX, =, 5, EOF
+    ASSERT_TRUE(tokens[1].is(kem::TokenType::IDENT));
+    ASSERT_EQ(tokens[1].lexeme, std::string("comentarioX"));
+}
+
+TEST(test_comentario_palabra_configurable_en_ingles) {
+    // El archivo english.json define "comment" como palabra de comentario
+    kem::LangConfig cfg_en("langs/english.json");
+    kem::Lexer lexer("int x comment this is ignored\nint y", cfg_en);
+    auto tokens = lexer.tokenize();
+    ASSERT_EQ((int)tokens.size(), 6); // int, x, NEWLINE, int, y, EOF
+}
+
+TEST(test_comentario_bloque_palabra_configurable_en_ingles) {
+    kem::LangConfig cfg_en("langs/english.json");
+    kem::Lexer lexer("int x comment{ ignored\nmultiline } int y", cfg_en);
+    auto tokens = lexer.tokenize();
+    ASSERT_EQ((int)tokens.size(), 5); // int, x, int, y, EOF
+}
+
 TEST(test_linea_columna) {
     auto tokens = lex("funcion\nfibonacci");
     ASSERT_EQ(tokens[0].line, 1);

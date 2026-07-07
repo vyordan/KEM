@@ -20,8 +20,8 @@ lo que permite usar el mismo compilador en cualquier idioma natural.
 7. [Procedimientos](#7-procedimientos)
 8. [Arreglos](#8-arreglos)
 9. [Estructuras](#9-estructuras)
-10. [Funciones de consola](#10-funciones-builtin-de-consola)
-11. [Interoperabilidad con C](#11-interoperabilidad-con-c-enlazar)
+10. [Funciones builtin de consola](#10-funciones-builtin-de-consola)
+11. [Interoperabilidad con C (`enlazar`)](#11-interoperabilidad-con-c-enlazar)
 12. [Comentarios](#12-comentarios)
 13. [Reglas de continuación de línea](#13-reglas-de-continuación-de-línea)
 14. [El sistema multi-idioma](#14-el-sistema-multi-idioma)
@@ -580,7 +580,6 @@ Las estructuras están diseñadas para ser completadas en la siguiente fase.
 ---
 
 ## 10. Funciones builtin de consola
-(ESTA FUNCION QUIZA SEA QUITADA MAS ADELANTE Y SE INCLUYA CUANDO YA TENGAMOS UNA LIBRERIA ESTADAR)
 
 KEM incluye funciones de entrada/salida integradas directamente en el
 compilador. No requieren `enlazar` ni ninguna declaracion especial.
@@ -764,7 +763,7 @@ inicio {
 
 ---
 
-## 11. Comentarios
+## 12. Comentarios
 
 KEM soporta cuatro estilos de comentarios, todos ignorados por el compilador:
 
@@ -789,7 +788,7 @@ recordar `//` y `/* */`.
 
 ---
 
-## 12. Reglas de continuación de línea
+## 13. Reglas de continuación de línea
 
 KEM **no usa punto y coma**. El compilador determina el fin de una
 sentencia por el salto de línea, con estas excepciones donde la línea
@@ -818,7 +817,7 @@ entero y = 10
 
 ---
 
-## 13. El sistema multi-idioma
+## 14. El sistema multi-idioma
 
 El compilador carga un archivo JSON que mapea palabras del idioma
 elegido a los tipos de token internos. Esto permite que el mismo
@@ -864,9 +863,110 @@ Copiar `langs/espanol.json` y reemplazar las palabras:
 El compilador valida que estén presentes las 21 keywords obligatorias
 y lanza un error descriptivo si falta alguna.
 
+### Palabras de comentario configurables
+
+El archivo de idioma también puede definir la palabra nativa de
+comentario del estilo KEM (`comentario` / `comentario{ }`) mediante
+dos claves especiales:
+
+```json
+{
+  "_comment_line":  "comentario",
+  "_comment_block": "comentario"
+}
+```
+
+En inglés, por ejemplo, sería:
+
+```json
+{
+  "_comment_line":  "comment",
+  "_comment_block": "comment"
+}
+```
+
+Si el idioma no define estas claves, el estilo nativo de comentario
+queda deshabilitado para ese idioma — los estilos universales `//` y
+`/* */` siguen funcionando siempre, sin depender de ninguna palabra.
+
+### Mensajes de error localizables
+
+Además de las keywords, **los mensajes de error también son
+traducibles** mediante un segundo archivo JSON ubicado en
+`langs/errors/`. Cada idioma de keywords tiene su archivo de errores
+correspondiente:
+
+```
+langs/
+├── espanol.json              (keywords)
+├── english.json               (keywords)
+└── errors/
+    ├── espanol.json           (mensajes de error en español)
+    └── english.json           (mensajes de error en inglés)
+```
+
+El compilador deriva automáticamente la ruta del archivo de errores
+a partir de la ruta del archivo de idioma: `langs/espanol.json` →
+`langs/errors/espanol.json`. No hace falta un flag separado.
+
+```bash
+./kem --lang=langs/english.json programa.kem
+# Las keywords se leen de langs/english.json
+# Los mensajes de error se leen de langs/errors/english.json
+```
+
+**Ejemplo del mismo error en ambos idiomas:**
+
+```bash
+$ ./kem programa_es.kem
+Error [Semántico] línea 5, col 10: Variable 'x' no declarada
+
+$ ./kem --lang=langs/english.json programa_en.kem
+Error [Semantic] line 5, col 10: Variable 'x' is not declared
+```
+
+#### Formato del archivo de mensajes de error
+
+Cada clave es un **código de error interno estable** (nunca cambia,
+es el identificador técnico) y el valor es la plantilla de texto con
+placeholders `{0}`, `{1}`, `{2}`... que se sustituyen por los datos
+concretos del error:
+
+```json
+{
+  "SEM_VAR_NO_DECLARADA":  "Variable '{0}' no declarada",
+  "SEM_ARGS_CANTIDAD":     "'{0}' espera {1} argumento(s), recibió {2}",
+  "SEM_FUNCION_NO_RETORNA":"La función '{0}' no siempre retorna un valor"
+}
+```
+
+#### Degradación controlada
+
+Si un idioma no tiene archivo de errores, o si le falta alguna clave
+específica, el compilador **no se rompe** — en vez de la traducción
+muestra el código entre corchetes junto con los argumentos:
+
+```
+[SEM_VAR_NO_DECLARADA] x
+```
+
+Esto permite agregar un idioma nuevo de forma incremental: las
+keywords pueden funcionar de inmediato aunque los mensajes de error
+todavía no estén traducidos.
+
+#### Agregar mensajes de error a un idioma nuevo
+
+1. Crear `langs/errors/mi_idioma.json`
+2. Copiar las claves de `langs/errors/espanol.json` como referencia
+   de qué códigos existen
+3. Traducir cada plantilla, manteniendo los mismos placeholders
+   `{0}`, `{1}`, etc. en el mismo orden de significado
+4. Probar con `./kem --lang=langs/mi_idioma.json programa.kem`
+   provocando distintos errores para verificar la traducción
+
 ---
 
-## 14. Qué se puede hacer
+## 15. Qué se puede hacer
 
 Lista completa de lo que KEM soporta en esta versión:
 
@@ -921,7 +1021,7 @@ Lista completa de lo que KEM soporta en esta versión:
 
 ---
 
-## 15. Qué NO se puede hacer todavía
+## 16. Qué NO se puede hacer todavía
 
 Limitaciones de la versión actual, planificadas para versiones futuras:
 
@@ -962,7 +1062,7 @@ Limitaciones de la versión actual, planificadas para versiones futuras:
 
 ---
 
-## 16. Mensajes de error
+## 17. Mensajes de error
 
 KEM produce mensajes de error en español con la fase donde ocurrió,
 la línea y columna exacta:
@@ -982,7 +1082,7 @@ en el primero.
 
 ---
 
-## 17. Referencia rápida de keywords
+## 18. Referencia rápida de keywords
 
 | Keyword      | Categoría       | Descripción                              |
 |--------------|-----------------|------------------------------------------|
