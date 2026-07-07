@@ -1,7 +1,10 @@
 {
   "_nombre": "english",
   "_descripcion": "English language file for KEM — demonstrates the multi-language system",
-  "_version": "0.1",
+  "_version": "0.2",
+
+  "_comment_line":  "comment",
+  "_comment_block": "comment",
 
   "int":           "KW_ENTERO",
   "float":         "KW_DECIMAL",

@@ -1,5 +1,6 @@
 #include "kem/Lexer.hpp"
 #include "kem/ErrorHandler.hpp"
+#include "kem/ErrorMessages.hpp"
 
 #include <sstream>
 
@@ -8,8 +9,8 @@ namespace kem {
 // ─────────────────────────────────────────────
 //  Constructor
 // ─────────────────────────────────────────────
-Lexer::Lexer(const std::string& src, const LangConfig& config)
-    : src_(src), config_(config) {}
+Lexer::Lexer(std::string src, const LangConfig& config)
+    : src_(std::move(src)), config_(config) {}
 
 // ─────────────────────────────────────────────
 //  Navegación
@@ -99,7 +100,7 @@ void Lexer::skipBlockComment() {
         advance();
     }
     // Si llegamos aquí, el bloque nunca se cerró
-    lexError("Comentario de bloque sin cerrar (falta '*/')", line_, col_);
+    lexError(errorMessages().format("LEX_COMENTARIO_BLOQUE_SIN_CERRAR"), line_, col_);
 }
 
 void Lexer::skipKemLineComment() {
@@ -121,7 +122,7 @@ void Lexer::skipKemBlockComment() {
         }
         advance();
     }
-    lexError("Bloque comentario{ sin cerrar (falta '}')", line_, col_);
+    lexError(errorMessages().format("LEX_COMENTARIO_KEM_SIN_CERRAR"), line_, col_);
 }
 
 // ─────────────────────────────────────────────
@@ -158,7 +159,7 @@ Token Lexer::readString() {
     std::string value;
     while (!isAtEnd() && current() != '"') {
         if (current() == '\n') {
-            lexError("Cadena de texto sin cerrar (no se permiten saltos de línea dentro de una cadena)",
+            lexError(errorMessages().format("LEX_STRING_NEWLINE"),
                      tokenStartLine_, tokenStartCol_);
         }
         // Secuencias de escape básicas
@@ -170,8 +171,8 @@ Token Lexer::readString() {
                 case '"':  value += '"';  advance(); break;
                 case '\\': value += '\\'; advance(); break;
                 default:
-                    lexError(std::string("Secuencia de escape desconocida: '\\") +
-                             current() + "'", line_, col_);
+                    lexError(errorMessages().format("LEX_ESCAPE_DESCONOCIDO",
+                             {std::string(1, current())}), line_, col_);
             }
         } else {
             value += advance();
@@ -179,7 +180,8 @@ Token Lexer::readString() {
     }
 
     if (isAtEnd()) {
-        lexError("Cadena de texto sin cerrar", tokenStartLine_, tokenStartCol_);
+        lexError(errorMessages().format("LEX_STRING_SIN_CERRAR"),
+                 tokenStartLine_, tokenStartCol_);
     }
 
     advance(); // consume la comilla de cierre '"'
@@ -197,42 +199,32 @@ Token Lexer::readIdentOrKw() {
         word += advance();
     }
 
-    // ── Comentarios con la palabra 'comentario' ──────────
-    // Verificamos si es la keyword de comentario del idioma.
-    // Para no hardcodear "comentario", revisamos si en el mapa
-    // hay una entrada que mapea a... espera, los comentarios NO
-    // son un TokenType — se descartan. Entonces verificamos
-    // literalmente la palabra, pero solo si el idioma la tiene
-    // como keyword de comentario.
-    //
-    // Solución: el JSON puede tener "_comment_line" y "_comment_block"
-    // como claves especiales. Aquí lo manejamos directamente buscando
-    // si el mapa tiene "comentario" como clave con un TokenType que
-    // no existe. En su lugar, el JSON de idioma reserva "comentario"
-    // explícitamente y el Lexer lo detecta aquí.
-    //
-    // Decisión de diseño: la palabra de comentario en línea es
-    // siempre la palabra que en el JSON tiene como valor "COMMENT_LINE"
-    // (un TokenType especial que el Lexer descarta).
-    // Por simplicidad en la fase 1, comprobamos directamente "comentario"
-    // en el idioma español. Esto se generalizará cuando se añada soporte
-    // a COMMENT_LINE / COMMENT_BLOCK en el JSON.
-    //
-    // Por ahora: si la palabra es "comentario", manejamos los dos casos.
-    // Esto se refactorizará cuando el sistema de idioma sea completo.
-    // TODO(fase-6): generalizar la detección de comentarios via LangConfig
+    // ── Comentarios nativos de KEM ("comentario" / "comentario{") ──────
+    // Las palabras de comentario ya NO están hardcodeadas — se leen desde
+    // el archivo de idioma vía LangConfig (claves "_comment_line" y
+    // "_comment_block"). Esto permite que cada idioma defina su propia
+    // palabra: "comentario" en español, "comment" en inglés, etc.
+    // Si el idioma no define estas claves, el estilo nativo queda
+    // deshabilitado para ese idioma — // y /* */ siguen funcionando
+    // siempre porque no dependen de ninguna palabra.
 
-    // Detectar comentario de bloque: "comentario{"
-    if (word == "comentario" && !isAtEnd() && current() == '{') {
+    const std::string& block_word = config_.commentBlockWord();
+    const std::string& line_word  = config_.commentLineWord();
+
+    // Detectar comentario de bloque: "<palabra>{"
+    // Se verifica primero porque comparte el mismo prefijo que el de línea.
+    if (!block_word.empty() && word == block_word &&
+        !isAtEnd() && current() == '{') {
         skipKemBlockComment();
         return Token(TokenType::UNKNOWN, "", tokenStartLine_, tokenStartCol_);
         // UNKNOWN aquí significa "descarta este token" — el tokenizador lo filtrará
     }
 
-    // Detectar comentario de línea: "comentario <resto>"
-    // Solo si NO es un identificador que empieza con "comentario"
-    // (ej: "comentarioX" es un identificador válido)
-    if (word == "comentario") {
+    // Detectar comentario de línea: "<palabra> <resto>"
+    // Solo si la palabra completa coincide exactamente — un identificador
+    // como "comentarioX" en español (o "commentX" en inglés) sigue siendo
+    // un identificador válido, no dispara el comentario.
+    if (!line_word.empty() && word == line_word) {
         skipKemLineComment();
         return Token(TokenType::UNKNOWN, "", tokenStartLine_, tokenStartCol_);
     }
@@ -290,7 +282,7 @@ Token Lexer::readSymbol() {
                 advance();
                 return makeToken(TokenType::NEQ, "!=");
             }
-            lexError("Carácter inesperado '!' (¿quisiste escribir '!='?)", line_, col_);
+            lexError(errorMessages().format("LEX_NOT_SIN_IGUAL"), line_, col_);
 
         case '<':
             if (!isAtEnd() && current() == '=') {
@@ -307,10 +299,8 @@ Token Lexer::readSymbol() {
             return makeToken(TokenType::GT, c);
 
         default: {
-            std::string msg = "Carácter inesperado '";
-            msg += c;
-            msg += "'";
-            lexError(msg, tokenStartLine_, tokenStartCol_);
+            lexError(errorMessages().format("LEX_CHAR_INESPERADO",
+                     {std::string(1, c)}), tokenStartLine_, tokenStartCol_);
         }
     }
 

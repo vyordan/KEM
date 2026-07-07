@@ -11,6 +11,7 @@
 #include "kem/IRGenerator.hpp"
 #include "kem/JITEngine.hpp"
 #include "kem/ErrorHandler.hpp"
+#include "kem/ErrorMessages.hpp"
 #include "kem/Token.hpp"
 #include "kem/AST.hpp"
 
@@ -293,6 +294,28 @@ int main(int argc, char* argv[]) {
         auto t0 = Clock::now();
         kem::LangConfig config(opts.lang_file);
         int64_t t_lang = us_since(t0);
+
+        // Cargar los mensajes de error en el mismo idioma que las keywords.
+        // Se deriva la ruta de "langs/espanol.json" -> "langs/errors/espanol.json".
+        // Si el archivo de errores no existe para ese idioma, se usa la
+        // instancia nula (los mensajes salen como "[CODIGO] args" en vez
+        // de texto traducido — degradación controlada, no falla el compilador).
+        {
+            std::string errors_path = opts.lang_file;
+            size_t slash = errors_path.rfind('/');
+            std::string dir  = (slash != std::string::npos) ? errors_path.substr(0, slash) : ".";
+            std::string file = (slash != std::string::npos) ? errors_path.substr(slash + 1) : errors_path;
+            std::string candidate = dir + "/errors/" + file;
+
+            std::ifstream test(candidate);
+            if (test.is_open()) {
+                test.close();
+                kem::setErrorMessages(kem::ErrorMessages(candidate));
+            }
+            // Si no existe, se queda con la instancia nula por defecto —
+            // no es un error fatal, solo significa que ese idioma no
+            // tiene mensajes de error traducidos todavía.
+        }
 
         if (!opts.benchmark)
             std::cout << "Idioma: " << config.langName() << "\n";

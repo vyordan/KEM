@@ -1,7 +1,10 @@
 {
   "_nombre": "espanol",
   "_descripcion": "Archivo de idioma español para KEM — idioma por defecto",
-  "_version": "0.1",
+  "_version": "0.2",
+
+  "_comment_line":  "comentario",
+  "_comment_block": "comentario",
 
   "entero":        "KW_ENTERO",
   "decimal":       "KW_DECIMAL",

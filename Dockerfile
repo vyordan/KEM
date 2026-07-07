@@ -1,27 +1,27 @@
 FROM archlinux:latest
 
+# ── Dependencias del sistema ───────────────────────────────────────────────────
 RUN pacman -Syu --noconfirm && \
     pacman -S --noconfirm \
         llvm \
         lld  \
-        clang \
         cmake \
         ninja \
         git && \
     pacman -Scc --noconfirm
 
-# Forzar CMake a usar Clang
-ENV CC=clang
-ENV CXX=clang++
-
+# ── Copiar el proyecto ─────────────────────────────────────────────────────────
 WORKDIR /kem
 COPY . .
 
+# ── Build ──────────────────────────────────────────────────────────────────────
 RUN cmake -B build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DKEM_BUILD_TESTS=OFF && \
     cmake --build build
 
+# ── Punto de entrada ───────────────────────────────────────────────────────────
+# langs/ queda en /kem/build/cli/langs/ (copiado por el target copy_langs)
 WORKDIR /kem/build/cli
 ENTRYPOINT ["./kem"]
 CMD ["--help"]

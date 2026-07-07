@@ -1,4 +1,5 @@
 #include "kem/Parser.hpp"
+#include "kem/ErrorMessages.hpp"
 #include <sstream>
 #include <iostream>
 
@@ -105,7 +106,7 @@ TypeAnnotation Parser::parseType() {
     }
 
     if (!isTypeToken(current().type)) {
-        syncError("Se esperaba un tipo (entero, decimal, texto, booleano)",
+        syncError(errorMessages().format("PARSE_ESPERABA_TIPO"),
                   current().line, current().col);
     }
 
@@ -116,13 +117,13 @@ TypeAnnotation Parser::parseType() {
     if (check(TokenType::LBRACKET)) {
         advance(); // consume '['
         if (!check(TokenType::INTEGER_LIT)) {
-            syncError("Se esperaba el tamaño del arreglo (un entero literal)",
+            syncError(errorMessages().format("PARSE_ESPERABA_TAMANO_ARREGLO"),
                       current().line, current().col);
         }
         ta.is_array   = true;
         ta.array_size = std::stoi(current().lexeme);
         advance(); // consume el número
-        expect(TokenType::RBRACKET, "Se esperaba ']' después del tamaño del arreglo");
+        expect(TokenType::RBRACKET, errorMessages().format("PARSE_ESPERABA_RBRACKET_TAMANO"));
     }
 
     return ta;
@@ -161,10 +162,9 @@ std::unique_ptr<Program> Parser::parse() {
     }
 
     if (errors_ > 0) {
-        std::ostringstream ss;
-        ss << "El programa tiene " << errors_
-           << " error(es) de sintaxis. Corregílos antes de continuar.";
-        throw KemError(Phase::PARSER, ss.str());
+        throw KemError(Phase::PARSER,
+            errorMessages().format("PARSE_ERRORES_ACUMULADOS",
+                {std::to_string(errors_)}));
     }
 
     return std::make_unique<Program>(std::move(decls), std::move(main_block));
@@ -179,7 +179,7 @@ NodePtr Parser::parseTopLevel() {
     if (check(TokenType::KW_ESTRUCTURA)) return parseStructDef();
     if (check(TokenType::KW_ENLAZAR))    return parseLinkDecl();
 
-    syncError("Se esperaba 'funcion', 'procedimiento', 'estructura', 'enlazar' o 'inicio'",
+    syncError(errorMessages().format("PARSE_ESPERABA_TIPO_O_DECL"),
               current().line, current().col);
     return nullptr;
 }
@@ -192,14 +192,14 @@ NodePtr Parser::parseFuncDef() {
     advance(); // consume 'funcion'
 
     if (!check(TokenType::IDENT)) {
-        syncError("Se esperaba el nombre de la función", current().line, current().col);
+        syncError(errorMessages().format("PARSE_ESPERABA_NOMBRE_FUNCION"), current().line, current().col);
     }
     std::string name = current().lexeme;
     advance();
 
-    expect(TokenType::LPAREN, "Se esperaba '(' después del nombre de la función");
+    expect(TokenType::LPAREN, errorMessages().format("PARSE_ESPERABA_LPAREN_FUNCION"));
     auto params = parseParams();
-    expect(TokenType::RPAREN, "Se esperaba ')' para cerrar los parámetros");
+    expect(TokenType::RPAREN, errorMessages().format("PARSE_ESPERABA_RPAREN_PARAMS"));
 
     // tipo de retorno obligatorio en funcion
     TypeAnnotation ret = parseType();
@@ -219,14 +219,14 @@ NodePtr Parser::parseProcDef() {
     advance(); // consume 'procedimiento'
 
     if (!check(TokenType::IDENT)) {
-        syncError("Se esperaba el nombre del procedimiento", current().line, current().col);
+        syncError(errorMessages().format("PARSE_ESPERABA_NOMBRE_PROC"), current().line, current().col);
     }
     std::string name = current().lexeme;
     advance();
 
-    expect(TokenType::LPAREN, "Se esperaba '(' después del nombre del procedimiento");
+    expect(TokenType::LPAREN, errorMessages().format("PARSE_ESPERABA_LPAREN_PROC"));
     auto params = parseParams();
-    expect(TokenType::RPAREN, "Se esperaba ')' para cerrar los parámetros");
+    expect(TokenType::RPAREN, errorMessages().format("PARSE_ESPERABA_RPAREN_PARAMS"));
 
     skipNewlines();
     auto body = parseBlock();
@@ -274,7 +274,7 @@ Param Parser::parseParam() {
         p.type.kind = TypeKind::UNKNOWN; // marcado como tipo de usuario
         advance();
     } else {
-        syncError("Se esperaba un tipo para el parámetro", current().line, current().col);
+        syncError(errorMessages().format("PARSE_ESPERABA_TIPO_PARAM"), current().line, current().col);
     }
 
     // En contexto de parámetro, cualquier token no vacío es un nombre válido
@@ -283,7 +283,7 @@ Param Parser::parseParam() {
         p.name = current().lexeme;
         advance();
     } else {
-        syncError("Se esperaba el nombre del parámetro", current().line, current().col);
+        syncError(errorMessages().format("PARSE_ESPERABA_NOMBRE_PARAM"), current().line, current().col);
     }
 
     return p;
@@ -297,13 +297,13 @@ NodePtr Parser::parseStructDef() {
     advance(); // consume 'estructura'
 
     if (!check(TokenType::IDENT)) {
-        syncError("Se esperaba el nombre de la estructura", current().line, current().col);
+        syncError(errorMessages().format("PARSE_ESPERABA_NOMBRE_ESTRUCT"), current().line, current().col);
     }
     std::string name = current().lexeme;
     advance();
 
     skipNewlines();
-    expect(TokenType::LBRACE, "Se esperaba '{' para abrir la estructura");
+    expect(TokenType::LBRACE, errorMessages().format("PARSE_ESPERABA_LBRACE_ESTRUCT"));
     skipNewlines();
 
     std::vector<StructField> fields;
@@ -322,14 +322,14 @@ NodePtr Parser::parseStructDef() {
             f.name = current().lexeme;
             advance();
         } else {
-            syncError("Se esperaba el nombre del campo", current().line, current().col);
+            syncError(errorMessages().format("PARSE_ESPERABA_NOMBRE_CAMPO"), current().line, current().col);
         }
         fields.push_back(std::move(f));
 
         skipNewlines();
     }
 
-    expect(TokenType::RBRACE, "Se esperaba '}' para cerrar la estructura");
+    expect(TokenType::RBRACE, errorMessages().format("PARSE_ESPERABA_RBRACE_ESTRUCT"));
     return std::make_unique<StructDef>(name, std::move(fields), ln, cl);
 }
 
@@ -343,12 +343,12 @@ NodePtr Parser::parseLinkDecl() {
     TypeAnnotation ret = parseType();
 
     if (!check(TokenType::IDENT)) {
-        syncError("Se esperaba el nombre de la función externa", current().line, current().col);
+        syncError(errorMessages().format("PARSE_ESPERABA_NOMBRE_FUNC_EXT"), current().line, current().col);
     }
     std::string name = current().lexeme;
     advance();
 
-    expect(TokenType::LPAREN, "Se esperaba '(' en la declaración enlazar");
+    expect(TokenType::LPAREN, errorMessages().format("PARSE_ESPERABA_LPAREN_ENLAZAR"));
 
     std::vector<TypeAnnotation> param_types;
     if (!check(TokenType::RPAREN)) {
@@ -358,7 +358,7 @@ NodePtr Parser::parseLinkDecl() {
         }
     }
 
-    expect(TokenType::RPAREN, "Se esperaba ')' para cerrar la declaración enlazar");
+    expect(TokenType::RPAREN, errorMessages().format("PARSE_ESPERABA_RPAREN_ENLAZAR"));
     return std::make_unique<LinkDecl>(ret, name, std::move(param_types), ln, cl);
 }
 
@@ -367,7 +367,7 @@ NodePtr Parser::parseLinkDecl() {
 // ─────────────────────────────────────────────
 NodePtr Parser::parseBlock() {
     int ln = current().line, cl = current().col;
-    expect(TokenType::LBRACE, "Se esperaba '{'");
+    expect(TokenType::LBRACE, errorMessages().format("PARSE_ESPERABA_DELIMITADOR", {"{"}));
     skipNewlines();
 
     std::vector<NodePtr> stmts;
@@ -385,7 +385,7 @@ NodePtr Parser::parseBlock() {
         }
     }
 
-    expect(TokenType::RBRACE, "Se esperaba '}' para cerrar el bloque");
+    expect(TokenType::RBRACE, errorMessages().format("PARSE_ESPERABA_RBRACE_BLOQUE"));
     return std::make_unique<Block>(std::move(stmts), ln, cl);
 }
 
@@ -410,7 +410,7 @@ NodePtr Parser::parseStmt() {
             return parseIdentStmt();
 
         default:
-            syncError("Sentencia no reconocida: '" + current().lexeme + "'",
+            syncError(errorMessages().format("PARSE_SENTENCIA_NO_RECONOCIDA", {current().lexeme}),
                       current().line, current().col);
             return nullptr;
     }
@@ -429,7 +429,7 @@ NodePtr Parser::parseVarOrArrayDecl() {
     // "x", "y", "o", "i", etc. que colisionan con keywords cortas)
     if (isAtEnd() || check(TokenType::NEWLINE) || check(TokenType::LBRACE) ||
         check(TokenType::RBRACE) || check(TokenType::EOF_TOK)) {
-        syncError("Se esperaba el nombre de la variable", current().line, current().col);
+        syncError(errorMessages().format("PARSE_ESPERABA_NOMBRE_VAR"), current().line, current().col);
     }
     std::string name = current().lexeme;
     advance();
@@ -442,24 +442,24 @@ NodePtr Parser::parseVarOrArrayDecl() {
         // Consumimos aquí:
         advance(); // '['
         if (!check(TokenType::INTEGER_LIT)) {
-            syncError("Se esperaba el tamaño del arreglo", current().line, current().col);
+            syncError(errorMessages().format("PARSE_ESPERABA_TAMANO_ARREGLO"), current().line, current().col);
         }
         type.is_array   = true;
         type.array_size = std::stoi(current().lexeme);
         advance();
-        expect(TokenType::RBRACKET, "Se esperaba ']'");
+        expect(TokenType::RBRACKET, errorMessages().format("PARSE_ESPERABA_DELIMITADOR", {"]"}));
 
         // Inicializador opcional
         std::vector<NodePtr> init;
         if (match(TokenType::EQ)) {
-            expect(TokenType::LBRACKET, "Se esperaba '[' para el inicializador del arreglo");
+            expect(TokenType::LBRACKET, errorMessages().format("PARSE_ESPERABA_LBRACKET_INIT"));
             if (!check(TokenType::RBRACKET)) {
                 init.push_back(parseExpr());
                 while (match(TokenType::COMMA)) {
                     init.push_back(parseExpr());
                 }
             }
-            expect(TokenType::RBRACKET, "Se esperaba ']' para cerrar el inicializador");
+            expect(TokenType::RBRACKET, errorMessages().format("PARSE_ESPERABA_RBRACKET_INIT"));
         }
 
         skipNewlines();
@@ -500,7 +500,7 @@ NodePtr Parser::parseIdentStmt() {
                 args.push_back(parseExpr());
             }
         }
-        expect(TokenType::RPAREN, "Se esperaba ')' para cerrar la llamada");
+        expect(TokenType::RPAREN, errorMessages().format("PARSE_ESPERABA_RPAREN_LLAMADA"));
         skipNewlines();
         return std::make_unique<CallExpr>(name, std::move(args), ln, cl);
     }
@@ -509,8 +509,8 @@ NodePtr Parser::parseIdentStmt() {
     if (check(TokenType::LBRACKET)) {
         advance(); // '['
         auto idx = parseExpr();
-        expect(TokenType::RBRACKET, "Se esperaba ']'");
-        expect(TokenType::EQ, "Se esperaba '=' para la asignación");
+        expect(TokenType::RBRACKET, errorMessages().format("PARSE_ESPERABA_DELIMITADOR", {"]"}));
+        expect(TokenType::EQ, errorMessages().format("PARSE_ESPERABA_DELIMITADOR", {"="}));
         auto val = parseExpr();
         skipNewlines();
 
@@ -524,11 +524,11 @@ NodePtr Parser::parseIdentStmt() {
         advance(); // '.'
         // El nombre del campo puede ser cualquier token (incluso keywords de 1 letra como "y", "o")
         if (isAtEnd() || check(TokenType::NEWLINE)) {
-            syncError("Se esperaba el nombre del campo después de '.'", current().line, current().col);
+            syncError(errorMessages().format("PARSE_ESPERABA_NOMBRE_CAMPO_PUNTO"), current().line, current().col);
         }
         std::string field = current().lexeme;
         advance();
-        expect(TokenType::EQ, "Se esperaba '=' para la asignación de campo");
+        expect(TokenType::EQ, errorMessages().format("PARSE_ESPERABA_DELIMITADOR", {"="}));
         auto val  = parseExpr();
         skipNewlines();
 
@@ -566,7 +566,7 @@ NodePtr Parser::parseIdentStmt() {
         return std::make_unique<AssignStmt>(std::move(target), std::move(start), ln, cl);
     }
 
-    syncError("Sentencia inesperada con identificador '" + name + "'", ln, cl);
+    syncError(errorMessages().format("PARSE_SENTENCIA_IDENT_INESPERADA", {name}), ln, cl);
     return nullptr;
 }
 
@@ -751,7 +751,7 @@ NodePtr Parser::parsePrimary() {
     if (check(TokenType::LPAREN)) {
         advance(); // consume '('
         auto expr = parseExpr();
-        expect(TokenType::RPAREN, "Se esperaba ')' para cerrar la expresión");
+        expect(TokenType::RPAREN, errorMessages().format("PARSE_ESPERABA_RPAREN_EXPR"));
         return expr;
     }
 
@@ -771,14 +771,14 @@ NodePtr Parser::parsePrimary() {
                     args.push_back(parseExpr());
                 }
             }
-            expect(TokenType::RPAREN, "Se esperaba ')' para cerrar la llamada a función");
+            expect(TokenType::RPAREN, errorMessages().format("PARSE_ESPERABA_RPAREN_LLAMADA_FN"));
             return std::make_unique<CallExpr>(name, std::move(args), ln, cl);
         }
 
         return std::make_unique<IdentExpr>(name, ln, cl);
     }
 
-    syncError("Expresión inesperada: '" + current().lexeme + "'",
+    syncError(errorMessages().format("PARSE_EXPR_INESPERADA", {current().lexeme}),
               current().line, current().col);
     return nullptr;
 }
@@ -796,7 +796,7 @@ NodePtr Parser::parsePostfix(NodePtr left) {
         if (check(TokenType::DOT)) {
             advance(); // '.'
             if (isAtEnd() || check(TokenType::NEWLINE)) {
-                syncError("Se esperaba el nombre del campo después de '.'",
+                syncError(errorMessages().format("PARSE_ESPERABA_NOMBRE_CAMPO_PUNTO"),
                           current().line, current().col);
             }
             std::string field = current().lexeme;
@@ -809,7 +809,7 @@ NodePtr Parser::parsePostfix(NodePtr left) {
         if (check(TokenType::LBRACKET)) {
             advance(); // '['
             auto idx = parseExpr();
-            expect(TokenType::RBRACKET, "Se esperaba ']' para cerrar el índice");
+            expect(TokenType::RBRACKET, errorMessages().format("PARSE_ESPERABA_RBRACKET_INDICE"));
             left = std::make_unique<IndexExpr>(std::move(left), std::move(idx), ln, cl);
             continue;
         }
