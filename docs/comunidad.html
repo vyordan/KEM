@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comunidad · KEM</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <a href="index.html" class="logo-area">
+      <img class="logo-img" src="logo.png" alt="Kem">
+      <div><div class="brand-text">Kem</div><div class="brand-sub">comunidad</div></div>
+    </a>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Inicio</a>
+      <a href="aprender.html" class="nav-btn-editor"><span>>_</span> Aprender</a>
+      <a href="docs.html">Documentación</a>
+      <a href="descargas.html">Descargas</a>
+      <a href="https://github.com/vyordan/kem" target="_blank">GitHub</a>
+      <a href="comunidad.html" class="active">Comunidad</a>
+    </div>
+  </nav>
+
+  <!-- ===== CONTENIDO ===== -->
+  <section class="page-section">
+    <h1 class="page-title">Comunidad</h1>
+    <p class="page-subtitle">KEM es un proyecto de código abierto. Tu contribución es bienvenida.</p>
+
+    <div class="cards-grid">
+      <!-- Tarjeta principal: GitHub -->
+      <div class="card" style="grid-column: 1 / -1; max-width: 700px; margin: 0 auto;">
+        <h3>GitHub</h3>
+        <p>
+          El repositorio principal de KEM está en GitHub. Aquí puedes:
+        </p>
+        <ul style="color: var(--color-text-secondary); margin: 1rem 0; padding-left: 1.5rem; line-height: 1.7;">
+          <li><strong>Reportar bugs</strong> o <strong>sugerir mejoras</strong> abriendo un <a href="https://github.com/vyordan/kem/issues" target="_blank" style="color: var(--color-accent);">issue</a>.</li>
+          <li><strong>Desarrollar nuevas funcionalidades</strong> para el compilador: haz un <a href="https://github.com/vyordan/kem/fork" target="_blank" style="color: var(--color-accent);">fork</a> del proyecto, trabaja en tu rama y luego envía un <strong>pull request</strong> hacia la rama <code>main</code> para que tus cambios sean revisados e incorporados.</li>
+        </ul>
+        <p style="margin-top: 1rem;">
+          <a href="https://github.com/vyordan/kem" target="_blank" style="color: var(--color-accent); font-weight: 600;">Visitar el repositorio →</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- ===== SECCIÓN DE ENCUESTA / OPINIÓN ===== -->
+    <div style="max-width: 700px; margin: 3rem auto 0; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 2rem; text-align: center;">
+      <h2 style="color: #fff; font-size: 1.5rem; margin-bottom: 1rem;">¿Mas contenido para KEM?</h2>
+      <p style="color: var(--color-text-secondary); line-height: 1.7; margin-bottom: 1.5rem;">
+        Estamos considerando abrir cuentas en redes sociales (X, Instagram, LinkedIn, etc.) para compartir avances, tutoriales y conectar con más personas interesadas en KEM.
+        <br><br>
+        <strong style="color: var(--color-accent);">¿Crees que sería útil?</strong> ¿O prefieres que el proyecto se mantenga solo en GitHub y la web?
+        <br><br>
+        Déjanos tu opinión — queremos saber si esto realmente aporta valor o si deberíamos enfocar nuestros esfuerzos en otra dirección.
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="https://github.com/vyordan/kem/issues/new" target="_blank" class="btn-hero" style="background: var(--color-accent); color: var(--color-bg-deep); padding: 0.7rem 1.8rem; border-radius: 60px; text-decoration: none; font-weight: 600; font-size: 0.95rem;">
+          Opinar en un issue
+        </a>
+        <a href="https://github.com/vyordan/kem/discussions" target="_blank" class="btn-hero" style="background: transparent; border: 1px solid var(--color-accent); color: var(--color-accent); padding: 0.7rem 1.8rem; border-radius: 60px; text-decoration: none; font-weight: 600; font-size: 0.95rem;">
+          Ver discusiones
+        </a>
+      </div>
+      <p style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 1.5rem;">
+        También puedes abrir un issue directamente con tu sugerencia o comentario.
+      </p>
+    </div>
+
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <p><code>Kem-lang</code> · Compilador JIT en C++ con LLVM · open source</p>
+    <p>
+      <a href="https://github.com/vyordan/kem" target="_blank">GitHub</a> ·
+      <a href="index.html">volver al inicio</a>
+    </p>
+  </footer>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>

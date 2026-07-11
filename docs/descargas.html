@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Descargas · KEM</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Estilo para elementos deshabilitados */
+    .card-disabled {
+      opacity: 0.55;
+      filter: grayscale(0.3);
+    }
+    .card-disabled .btn-disabled {
+      display: inline-block;
+      padding: 0.5rem 1.2rem;
+      background: var(--color-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-muted);
+      font-weight: 600;
+      cursor: not-allowed;
+      font-size: 0.85rem;
+      border: none;
+    }
+    .badge-coming {
+      color: var(--color-text-muted);
+      font-size: 0.8rem;
+      font-weight: 400;
+      margin-left: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <a href="index.html" class="logo-area">
+      <img class="logo-img" src="logo.png" alt="Kem">
+      <div>
+        <div class="brand-text">Kem</div>
+        <div class="brand-sub">descargas</div>
+      </div>
+    </a>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Inicio</a>
+      <a href="aprender.html" class="nav-btn-editor"><span>>_</span> Aprender</a>
+      <a href="docs.html">Documentación</a>
+      <a href="descargas.html" class="active">Descargas</a>
+      <a href="https://github.com/vyordan/kem" target="_blank">GitHub</a>
+      <a href="comunidad.html">Comunidad</a>
+    </div>
+  </nav>
+
+  <!-- ===== CONTENIDO ===== -->
+  <section class="page-section">
+    <h1 class="page-title">Descargas</h1>
+    <p class="page-subtitle">Obtén el compilador KEM para tu plataforma o ejecútalo con Docker.</p>
+
+    <div class="cards-grid">
+
+      <!-- Windows (deshabilitado) -->
+      <div class="card card-disabled">
+        <h3>Windows</h3>
+        <p>
+          Binario .exe para Windows 10/11 (64 bits).
+          <span class="badge-coming">(Próximamente)</span>
+        </p>
+        <span class="btn-disabled">No disponible</span>
+      </div>
+
+      <!-- Linux (deshabilitado) -->
+      <div class="card card-disabled">
+        <h3>Linux</h3>
+        <p>
+          Binario estático para Linux x86_64 (AppImage).
+          <span class="badge-coming">(Próximamente)</span>
+        </p>
+        <span class="btn-disabled">No disponible</span>
+      </div>
+
+      <!-- Docker (habilitado) -->
+      <div class="card">
+        <h3>Docker</h3>
+        <p>Imagen oficial publicada en Docker Hub.</p>
+        <code style="display:block; margin:0.5rem 0; background: var(--color-code-bg); padding: 0.5rem 0.8rem; border-radius: 8px; color: var(--color-accent);">
+          docker pull vyordan/kem:latest
+        </code>
+        <a href="https://hub.docker.com/r/vyordan/kem" target="_blank">Ver en Docker Hub</a>
+      </div>
+
+      <!-- Código fuente (habilitado) -->
+      <div class="card">
+        <h3>Código fuente</h3>
+        <p>Compila desde fuente con CMake y LLVM.</p>
+        <a href="https://github.com/vyordan/kem" target="_blank">Ir al repositorio en GitHub</a>
+      </div>
+
+    </div>
+
+    <p style="color:var(--color-text-muted); margin-top:2rem;">
+      Versión actual: <strong style="color:#fff;">0.1.0</strong> ·
+    </p>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <p><code>Kem-lang</code> · Compilador JIT en C++ con LLVM · open source</p>
+    <p>
+      <a href="https://github.com/vyordan/kem" target="_blank">GitHub</a> ·
+      <a href="index.html">volver al inicio</a>
+    </p>
+  </footer>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>
